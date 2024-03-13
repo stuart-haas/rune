@@ -9,7 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const jobRunnerConfigPath = "jobs.yml"
+const jobRunnerConfigPath = "rune.yml"
 
 type Task struct {
 	Description *string

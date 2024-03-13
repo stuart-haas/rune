@@ -21,7 +21,6 @@ go run . internal.yml link
 ## TODO
 
 * Add Cobra/Viper for the CLI
-* More useful keys for tasks
 * Add flags
   ```
   --ignore-errors # skips errors

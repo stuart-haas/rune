@@ -29,3 +29,7 @@ tasks:
     commands:
       - sudo rm /usr/local/bin/rune
       - which rune
+  verify:
+    description: check path for executable
+    commands:
+      - which rune
