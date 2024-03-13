@@ -3,7 +3,7 @@
 <p>
 A mythical and legendary task runner.
 </p>
-<img src="https://github.com/stuart-haas/rune/assets/12514075/96ce5749-2047-407c-8b20-03ab4eb08b1b" />
+<img src="https://github.com/stuart-haas/rune/assets/12514075/5f7300bb-5f24-4c6e-a379-a9ff3028c7df" />
 </div>
 
 ## Install
