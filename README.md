@@ -21,6 +21,12 @@ go run . internal.yml link
 ## TODO
 
 * Add Cobra/Viper for the CLI
+* Support env vars
+* Support template vars
+* Support remote tasks
+* Extendable API
+* HTTP server
+* Docker support
 * Add flags
   ```
   --ignore-errors # skips errors
