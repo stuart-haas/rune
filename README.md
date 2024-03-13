@@ -1,6 +1,10 @@
-# Rune
-
-> A mythical and legendary task runner.
+<div align="center">
+<h1>RUNE</h1>
+<p>
+A mythical and legendary task runner.
+</p>
+<img src="https://github.com/stuart-haas/rune/assets/12514075/96ce5749-2047-407c-8b20-03ab4eb08b1b" />
+</div>
 
 ## Install
 
@@ -9,10 +13,6 @@ go run . internal.yml link
 ```
 
 ## Usage
-
-### Run default task
-
-`rune internal.yml`
 
 ### Run specific Task
 
