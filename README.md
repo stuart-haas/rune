@@ -27,6 +27,7 @@ go run . internal.yml link
 * Extendable API
 * HTTP server
 * Docker support
+* Extend/include
 * Add flags
   ```
   --ignore-errors # skips errors
