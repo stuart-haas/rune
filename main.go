@@ -11,18 +11,12 @@ import (
 
 const jobRunnerConfigPath = "jobs.yml"
 
-type Tasks map[string]Task
-
 type Task struct {
 	Description *string
 	Depends     []string
 	Commands    []interface{}
-	Error       *struct {
-		Tasks
-	}
-	Success *struct {
-		Tasks
-	}
+	Error       *Task
+	Success     *Task
 }
 
 type Job struct {
@@ -30,9 +24,9 @@ type Job struct {
 	Version     string
 	Name        *string
 	Description *string
-	Tasks
-	Success *Task
-	Error   *Task
+	Tasks       map[string]Task
+	Success     *Task
+	Error       *Task
 }
 
 type JobRunnerConfig struct {
@@ -57,44 +51,34 @@ func NewJobRunner() (*JobRunner, error) {
 }
 
 func (r *JobRunner) Run(args []string) error {
+	if len(args) == 1 {
+		return errors.New("PLEASE SPECIFY TASK")
+	}
 	err := r.loadJobConfig(args)
 	if err != nil {
 		return err
 	}
-	if len(args) == 1 {
-		return r.RunTasks(r.job.Tasks)
-	}
-	if len(args) == 2 {
-		return r.RunTask(r.job.args[1])
-	}
-	return nil
+	return r.runTask(args[1])
 }
 
-func (r *JobRunner) RunTasks(tasks Tasks) error {
-	for _, task := range tasks {
-		if err := r.RunTask(task); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (r *JobRunner) RunTask(key interface{}) error {
-	task := r.getTask(key)
+func (r *JobRunner) runTask(key string) error {
+	task := r.job.Tasks[key]
 
 	if task.Depends != nil {
 		fmt.Printf("[STARTING TASK] %s\n", key)
 		fmt.Printf("[EXECUTING TASK DEPENDENCIES] %s\n", task.Depends)
-
 		for _, dep := range task.Depends {
-			if err := r.RunTask(dep); err != nil {
+			if err := r.runTask(dep); err != nil {
 				return err
 			}
 		}
 	}
 
 	fmt.Printf("[EXECUTING TASK] %s\n", key)
+	return r.runCommands(task)
+}
 
+func (r *JobRunner) runCommands(task Task) error {
 	for _, command := range task.Commands {
 		switch t := command.(type) {
 		case string:
@@ -105,7 +89,7 @@ func (r *JobRunner) RunTask(key interface{}) error {
 
 			if err := cmd.Run(); err != nil {
 				if task.Error != nil {
-					return r.RunTasks(task.Error.Tasks)
+					return r.runCommands(*task.Error)
 				}
 				return err
 			}
@@ -114,26 +98,14 @@ func (r *JobRunner) RunTask(key interface{}) error {
 		}
 	}
 	if task.Success != nil {
-		return r.RunTasks(task.Success.Tasks)
-	}
-	return nil
-}
-
-func (r *JobRunner) getTask(key interface{}) *Task {
-	switch t := key.(type) {
-	case string:
-		task := r.job.Tasks[key.(string)]
-		return &task
-	case Task:
-		return &t
-	default:
+		return r.runCommands(*task.Success)
 	}
 	return nil
 }
 
 func (r *JobRunner) loadJobConfig(args []string) error {
 	if len(args) == 0 {
-		return errors.New("PLEASE PROVIDE THE JOB FILE NAME")
+		return errors.New("PLEASE SPECIFY JOB FILE")
 	}
 
 	filePath := fmt.Sprintf("%s/%s", r.config.Root, args[0])

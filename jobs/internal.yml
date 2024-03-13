@@ -1,8 +1,31 @@
 version: '1.0'
 tasks:
   build:
-    description: Build the program and make it executable
+    description: build the program and make it executable
     commands:
-      - go build -o runner
-      - chmod +x ./runner
-      - echo "OK"
+      - go build -o rune
+      - chmod +x ./rune
+  check:
+    description: check if executable is already symlinked
+    depends: [build]
+    commands:
+      - |
+        if [ -f /usr/local/bin/rune ]; then
+          echo "rune is already installed"
+          exit 1
+        fi
+        exit 0
+  link:
+    description: create symlink to executable
+    depends: [check]
+    commands:
+      - |
+        sudo ln -s $PWD/rune /usr/local/bin/rune
+        chown $USER:$USER /usr/local/bin/rune
+        chmod +x rune
+        which rune
+  unlink:
+    description: delete symlink to executable
+    commands:
+      - sudo rm /usr/local/bin/rune
+      - which rune

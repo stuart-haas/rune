@@ -1,21 +1,22 @@
-# GO Job Runner
+# Rune
+
+> A mythical and legendary task runner.
 
 ## Install
 
 ```
-go build -o runner
-chmod +x ./runner
+go run . internal.yml link
 ```
 
 ## Usage
 
-### Run Task in Sequence
+### Run default task
 
-`./runner nginx.yml`
+`rune internal.yml`
 
 ### Run specific Task
 
-`./runner nginx.yml verify`
+`rune internal.yml verify`
 
 ## TODO
 
