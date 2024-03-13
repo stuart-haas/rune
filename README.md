@@ -2,6 +2,8 @@
 
 > A mythical and legendary task runner.
 
+![dune_787564](https://github.com/stuart-haas/rune/assets/12514075/96ce5749-2047-407c-8b20-03ab4eb08b1b)
+
 ## Install
 
 ```
