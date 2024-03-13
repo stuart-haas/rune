@@ -1,0 +1,8 @@
+version: '1.0'
+tasks:
+  build:
+    description: Build the program and make it executable
+    commands:
+      - go build -o runner
+      - chmod +x ./runner
+      - echo "OK"
