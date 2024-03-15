@@ -3,7 +3,7 @@ tasks:
   build:
     description: build the program and make it executable
     commands:
-      - go build -o rune
+      - go build
       - chmod +x ./rune
   check:
     description: check if executable is already symlinked

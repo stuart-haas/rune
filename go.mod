@@ -1,4 +1,4 @@
-module task-runner
+module rune
 
 go 1.19
 
