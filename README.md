@@ -1,42 +1,9 @@
-<div align="center">
-<h1>RUNE</h1>
-<p>
-A mythical and legendary task runner.
-</p>
-<img src="https://github.com/stuart-haas/rune/assets/12514075/5f7300bb-5f24-4c6e-a379-a9ff3028c7df" />
-</div>
+# RUNE
 
-## Install
+## Requirements
 
-```
-go run . internal.yml link
-```
-
-## Usage
-
-### Run specific Task
-
-`rune internal.yml verify`
-
-## TODO
-
-* Add Cobra/Viper for the CLI
-* Support env vars
-* Support template vars
-* Support remote tasks
-* Extendable API
-* HTTP server
-* Docker support
-* Extend/include
-* Add flags
-  ```
-  --ignore-errors # skips errors
-  --task # specify tasks or tasks to run in sequence
-  --sequential # execute tasks in sequence (default)
-  --parallel # execute tasks in parallel
-  --ignore-tasks # specify task or tasks to ignore
-  --config # specifiy location of runner config
-  --work-dir # specifiy working directory
-  --install # build and make symbol link in /usr/local/bin
-  --docker # support executing from Docker image
-  ```
+* Install GoLang -https://go.dev/doc/install
+* Give sudo permissions to a user:
+  * Edit sudoers file with `sudo visudo`.
+  * At the end of the file add `<user> ALL=(ALL) NOPASSWD: ALL`, replacing <user> with the username you want to give sudo privileges to.
+  * Save the file and run `sudo usermod -aG sudo <user>`, replacing <user> with the username you want to give sudo privileges to.
