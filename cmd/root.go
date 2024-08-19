@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"rune/node"
+	"rune/services"
 
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
@@ -13,35 +13,41 @@ import (
 var rootCmd = &cobra.Command{
 	Use: "rune",
 	Short: "Welcome to the Rune CLI",
-	Run: func(cmd *cobra.Command, args []string) {
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		figure.NewFigure("RUNE", "small", true).Print()
 		fmt.Println()
 	},
 }
 
-var sshExecCmd = &cobra.Command{
-	Use: "ssh-exec",
-	Short: "Run ssh command on Node and display result once finished",
+var sshStartCmd = &cobra.Command{
+	Use: "ssh-start",
+	Short: "Start ssh command on node.",
 	Run: func(cmd *cobra.Command, args []string) {
-		host := node.Host{
+		client, err := services.NewSSHClient(services.SSHClientConfig{
 			Hostname: "localhost",
 			User: "stuart",
+		})
+		if err != nil {
+			log.Fatal(err)
 		}
-		if err := node.ExecuteSSH(host); err != nil {
+		if err := client.Start(); err != nil {
 			log.Fatal(err)
 		}
 	},
 }
 
-var sshStreamCmd = &cobra.Command{
-	Use: "ssh-stream",
-	Short: "Run ssh command on Node and stream result",
+var sshRunCmd = &cobra.Command{
+	Use: "ssh-run",
+	Short: "Run ssh command on node.",
 	Run: func(cmd *cobra.Command, args []string) {
-		host := node.Host{
+		client, err := services.NewSSHClient(services.SSHClientConfig{
 			Hostname: "localhost",
 			User: "stuart",
+		})
+		if err != nil {
+			log.Fatal(err)
 		}
-		if err := node.StreamSSH(host); err != nil {
+		if err := client.Run(); err != nil {
 			log.Fatal(err)
 		}
 	},
@@ -50,8 +56,8 @@ var sshStreamCmd = &cobra.Command{
 func init() {
 	viper.AutomaticEnv()
 
-	rootCmd.AddCommand(sshExecCmd)
-	rootCmd.AddCommand(sshStreamCmd)
+	rootCmd.AddCommand(sshStartCmd)
+	rootCmd.AddCommand(sshRunCmd)
 }
 
 func Execute() error {
