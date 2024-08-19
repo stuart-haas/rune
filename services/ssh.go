@@ -13,7 +13,7 @@ import (
 )
 
 type SSHClientConfig struct {
-	User string
+	User     string
 	Hostname string
 }
 
@@ -28,7 +28,7 @@ type SSHConnection struct {
 	StdErr io.Reader
 }
 
-func NewSSHClient (conf SSHClientConfig) (*SSHClient, error) {
+func NewSSHClient(conf SSHClientConfig) (*SSHClient, error) {
 	return &SSHClient{
 		Conf: conf,
 	}, nil
@@ -41,7 +41,7 @@ func (s *SSHClient) Run() error {
 	}
 
 	defer s.Close(*conn)
-	
+
 	if err := conn.Session.Run("ls"); err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func (s *SSHClient) Run() error {
 	}
 
 	fmt.Printf("Output:\n%s\n", string(output))
-  fmt.Printf("Error Output:\n%s\n", string(errorOutput))
+	fmt.Printf("Error Output:\n%s\n", string(errorOutput))
 
 	return nil
 }
@@ -77,25 +77,25 @@ func (s *SSHClient) Start() error {
 	go func() {
 		scanner := bufio.NewScanner(conn.StdOut)
 		for scanner.Scan() {
-				fmt.Println(scanner.Text())
+			fmt.Println(scanner.Text())
 		}
 		if err := scanner.Err(); err != nil {
-				log.Printf("Error reading stdout: %v", err)
+			log.Printf("Error reading stdout: %v", err)
 		}
 	}()
 
 	go func() {
 		scanner := bufio.NewScanner(conn.StdErr)
 		for scanner.Scan() {
-				fmt.Println("STDERR:", scanner.Text())
+			fmt.Println("STDERR:", scanner.Text())
 		}
 		if err := scanner.Err(); err != nil {
-				log.Printf("Error reading stderr: %v", err)
+			log.Printf("Error reading stderr: %v", err)
 		}
 	}()
 
 	if err := conn.Session.Wait(); err != nil {
-			return err
+		return err
 	}
 
 	return nil
@@ -128,10 +128,10 @@ func (s *SSHClient) Connect() (*SSHConnection, error) {
 	}
 
 	return &SSHConnection{
-		Client: client,
+		Client:  client,
 		Session: session,
-		StdOut: stdout,
-		StdErr: stderr,
+		StdOut:  stdout,
+		StdErr:  stderr,
 	}, nil
 }
 

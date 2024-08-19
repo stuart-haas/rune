@@ -11,7 +11,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use: "rune",
+	Use:   "rune",
 	Short: "Welcome to the Rune CLI",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		figure.NewFigure("RUNE", "small", true).Print()
@@ -20,12 +20,12 @@ var rootCmd = &cobra.Command{
 }
 
 var sshStartCmd = &cobra.Command{
-	Use: "ssh-start",
+	Use:   "ssh-start",
 	Short: "Start ssh command on node.",
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := services.NewSSHClient(services.SSHClientConfig{
 			Hostname: "localhost",
-			User: "stuart",
+			User:     "stuart",
 		})
 		if err != nil {
 			log.Fatal(err)
@@ -37,12 +37,12 @@ var sshStartCmd = &cobra.Command{
 }
 
 var sshRunCmd = &cobra.Command{
-	Use: "ssh-run",
+	Use:   "ssh-run",
 	Short: "Run ssh command on node.",
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := services.NewSSHClient(services.SSHClientConfig{
 			Hostname: "localhost",
-			User: "stuart",
+			User:     "stuart",
 		})
 		if err != nil {
 			log.Fatal(err)
