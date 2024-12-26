@@ -1,21 +1,48 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"rune/db"
 
 	"github.com/spf13/cobra"
 )
 
+var nodeCmd = &cobra.Command{
+	Use:   "node",
+	Short: "Node management",
+}
+
 var createNodeCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a new node",
 	Run: func(cmd *cobra.Command, args []string) {
-		db.Client.Create(&db.Node{})
-		record := db.Node{}
-		db.Client.Find(&record)
-		fmt.Println(record)
+		hostname, err := cmd.Flags().GetString("hostname")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		user, err := cmd.Flags().GetString("user")
+		if err != nil {
+			log.Fatal(err)
+		}
+		publicKey, err := cmd.Flags().GetString("public-key")
+		if err != nil {
+			log.Fatal(err)
+		}
+		node := db.Node{Hostname: hostname, User: user, PublicKey: publicKey}
+		db.Client.Create(&node)
+		log.Println("Node created")
+		log.Println(node)
+	},
+}
+
+var deleteNodeCmd = &cobra.Command{
+	Use:   "delete",
+	Short: "Delete a node",
+	Run: func(cmd *cobra.Command, args []string) {
+		id := args[0]
+		db.Client.Delete(&db.Node{}, id)
+		log.Println("Node deleted")
 	},
 }
 
@@ -23,5 +50,10 @@ func init() {
 	if err := db.Connect(); err != nil {
 		log.Fatal(err)
 	}
-	rootCmd.AddCommand(createNodeCmd)
+	nodeCmd.AddCommand(createNodeCmd)
+	createNodeCmd.Flags().StringP("hostname", "n", "", "Hostname")
+	createNodeCmd.Flags().StringP("user", "u", "", "User")
+	createNodeCmd.Flags().StringP("public-key", "p", "", "Public key")
+	nodeCmd.AddCommand(deleteNodeCmd)
+	rootCmd.AddCommand(nodeCmd)
 }

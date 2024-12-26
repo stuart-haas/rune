@@ -4,6 +4,7 @@
     <title>{{ .title }}</title>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/static/js/nodes.js"></script>
 </head>
 <body class="bg-gray-100">
     <div class="bg-gray-800 text-white mb-8">
@@ -16,81 +17,102 @@
         </div>
     </div>
     <div class="max-w-6xl mx-auto px-8">
-        <div x-data="{
-            nodes: [],
-            loading: false,
-            showModal: false,
-            newNode: {
-                hostname: '',
-                user: '',
-                publicKey: ''
-            },
-            isEditing: false,
-            editingNodeId: null,
-            async fetchNodes() {
-                this.loading = true
-                try {
-                    const response = await fetch('/nodes')
-                    const data = await response.json()
-                    this.nodes = data.nodes
-                } catch (error) {
-                    console.error('Error fetching nodes:', error)
-                } finally {
-                    this.loading = false
-                }
-            },
-            async deleteNode(id) {
-                if (!confirm('Are you sure you want to delete this node?')) {
-                    return
-                }
-                try {
-                    await fetch(`/nodes/${id}`, { method: 'DELETE' })
-                    await this.fetchNodes() // Refresh the list after deletion
-                } catch (error) {
-                    console.error('Error deleting node:', error)
-                    alert('Failed to delete node')
-                }
-            },
-            async addNode() {
-                try {
-                    const url = this.isEditing ? `/nodes/${this.editingNodeId}` : '/nodes'
-                    const method = this.isEditing ? 'PUT' : 'POST'
-                    
-                    await fetch(url, {
-                        method: method,
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(this.newNode)
-                    })
-                    this.showModal = false
-                    this.newNode = { hostname: '', user: '', publicKey: '' }
-                    this.isEditing = false
-                    this.editingNodeId = null
-                    await this.fetchNodes()
-                } catch (error) {
-                    console.error('Error saving node:', error)
-                    alert('Failed to save node')
-                }
-            },
-            editNode(node) {
-                this.isEditing = true
-                this.editingNodeId = node.ID
-                this.newNode = {
-                    hostname: node.Hostname,
-                    user: node.User,
-                    publicKey: node.PublicKey
-                }
-                this.showModal = true
-            }
-        }" x-init="fetchNodes()">
-            <!-- Add Node Button -->
-            <div class="text-left mb-8">
+        <div x-data="nodeManager()" x-init="init()">
+            <!-- Add Node and View Toggle Buttons -->
+            <div class="flex justify-between mb-8">
                 <button 
                     @click="showModal = true"
                     class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition-colors">
                     Add Node
                 </button>
+
+                <button 
+                    @click="toggleView()"
+                    class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-md transition-colors">
+                    <span x-text="isGridView ? 'Switch to Table' : 'Switch to Grid'"></span>
+                    <svg x-show="isGridView" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                    </svg>
+                    <svg x-show="!isGridView" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Loading State -->
+            <div x-show="loading" class="text-center text-gray-600">Loading nodes...</div>
+
+            <!-- Grid View -->
+            <div x-show="!loading && isGridView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <template x-for="node in nodes">
+                    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                        <h3 class="text-lg font-semibold mb-2" x-text="node.Hostname"></h3>
+                        <p class="text-gray-600 mb-2">User: <span x-text="node.User"></span></p>
+                        <p class="text-gray-600 mb-2">Public Key: <span x-text="node.PublicKey"></span></p>
+                        <p class="text-gray-600 mb-4">Created: <span x-text="new Date(node.CreatedAt).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })"></span></p>
+                        <div class="flex space-x-2">
+                            <button 
+                                @click="editNode(node)"
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors">
+                                Edit
+                            </button>
+                            <button 
+                                @click="deleteNode(node.ID)"
+                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Table View -->
+            <div x-show="!loading && !isGridView" class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg shadow-md">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hostname</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Public Key</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <template x-for="node in nodes">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" x-text="node.Hostname"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" x-text="node.User"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" x-text="node.PublicKey"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" x-text="new Date(node.CreatedAt).toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button 
+                                        @click="editNode(node)"
+                                        class="text-indigo-600 hover:text-indigo-900">
+                                        Edit
+                                    </button>
+                                    <button 
+                                        @click="deleteNode(node.ID)"
+                                        class="text-red-600 hover:text-red-900">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
             </div>
 
             <!-- Modal -->
@@ -148,36 +170,6 @@
                         </div>
                     </form>
                 </div>
-            </div>
-
-            <div x-show="loading" class="text-center text-gray-600">Loading nodes...</div>
-            <div x-show="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <template x-for="node in nodes">
-                    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-                        <h3 class="text-lg font-semibold mb-2" x-text="node.Hostname"></h3>
-                        <p class="text-gray-600 mb-2">User: <span x-text="node.User"></span></p>
-                        <p class="text-gray-600 mb-2">Public Key: <span x-text="node.PublicKey"></span></p>
-                        <p class="text-gray-600 mb-4">Created: <span x-text="new Date(node.CreatedAt).toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'short', 
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        })"></span></p>
-                        <div class="flex space-x-2">
-                            <button 
-                                @click="editNode(node)"
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors">
-                                Edit
-                            </button>
-                            <button 
-                                @click="deleteNode(node.ID)"
-                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors">
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                </template>
             </div>
         </div>
     </div>
