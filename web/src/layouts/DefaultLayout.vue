@@ -26,8 +26,9 @@
         </div>
       </div>
     </div>
-    
-    <router-view></router-view>
+    <div class="max-w-6xl mx-auto px-8">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 

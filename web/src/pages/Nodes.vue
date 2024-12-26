@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-6xl mx-auto px-8">
+  <div class="page">
     <div class="mb-4 flex justify-between">
       <Button variant="default" @click="showNewNodeDialog = true">
         <FontAwesomeIcon icon="plus" class="mr-2" />

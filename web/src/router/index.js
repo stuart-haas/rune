@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Nodes from '@/pages/Nodes.vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import Nodes from '@/pages/Nodes.vue'
+import Settings from '@/pages/Settings.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -28,7 +29,7 @@ const router = createRouter({
         {
           path: 'settings',
           name: 'Settings',
-          component: Nodes,
+          component: Settings,
           meta: {
             title: 'Settings'
           }
