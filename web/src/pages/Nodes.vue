@@ -39,7 +39,7 @@
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction class="bg-red-500" @click="handleDelete(node.id)">
+                <AlertDialogAction class="bg-red-500" @click="handleDelete(node.ID)">
                   <FontAwesomeIcon icon="trash" />
                   Continue
                 </AlertDialogAction>
@@ -86,7 +86,7 @@
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction class="bg-red-500" @click="handleDelete(node.id)">
+                    <AlertDialogAction class="bg-red-500" @click="handleDelete(node.ID)">
                       <FontAwesomeIcon icon="trash" />
                       Continue
                     </AlertDialogAction>
@@ -146,7 +146,7 @@
         </div>
         <DialogFooter>
           <Button variant="outline" @click="showNewNodeDialog = false">Cancel</Button>
-          <Button @click="handleCreateNode">Create</Button>
+          <Button @click="handleCreate">Create</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -215,6 +215,17 @@ const editForm = ref({
   publicKey: ''
 })
 
+
+const handleCreate = async () => {
+  try {
+    await createNode(newNodeForm.value)
+    showNewNodeDialog.value = false
+    newNodeForm.value = { hostname: '', user: '', publicKey: '' }
+  } catch (error) {
+    console.error('Failed to create node:', error)
+  }
+}
+
 const handleEdit = (node) => {
   console.log('Editing node:', node)
   editingNode.value = node
@@ -239,16 +250,6 @@ const handleDelete = async (id) => {
     await deleteNode(id)
   } catch (error) {
     console.error('Failed to delete node:', error)
-  }
-}
-
-const handleCreateNode = async () => {
-  try {
-    await createNode(newNodeForm.value)
-    showNewNodeDialog.value = false
-    newNodeForm.value = { hostname: '', user: '', publicKey: '' }
-  } catch (error) {
-    console.error('Failed to create node:', error)
   }
 }
 </script>
