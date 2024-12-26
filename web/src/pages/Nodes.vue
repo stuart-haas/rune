@@ -1,6 +1,10 @@
 <template>
   <div class="max-w-6xl mx-auto px-8">
-    <div class="mb-4 flex justify-end">
+    <div class="mb-4 flex justify-end space-x-2">
+      <Button variant="default" @click="showNewNodeDialog = true">
+        <FontAwesomeIcon icon="plus" class="mr-2" />
+        New Node
+      </Button>
       <Button variant="outline" @click="isGridView = !isGridView">
         <FontAwesomeIcon :icon="isGridView ? 'table-list' : 'table-cells'" class="mr-2" />
         {{ isGridView ? 'Table View' : 'Grid View' }}
@@ -120,6 +124,32 @@
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <Dialog :open="showNewNodeDialog" @update:open="showNewNodeDialog = false">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add New Node</DialogTitle>
+        </DialogHeader>
+        <div class="grid gap-4 py-4">
+          <div class="grid gap-2">
+            <label for="new-hostname">Hostname</label>
+            <Input id="new-hostname" v-model="newNodeForm.hostname" />
+          </div>
+          <div class="grid gap-2">
+            <label for="new-user">User</label>
+            <Input id="new-user" v-model="newNodeForm.user" />
+          </div>
+          <div class="grid gap-2">
+            <label for="new-publicKey">Public Key</label>
+            <Input id="new-publicKey" v-model="newNodeForm.publicKey" />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" @click="showNewNodeDialog = false">Cancel</Button>
+          <Button @click="handleCreateNode">Create</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>
 
@@ -165,11 +195,19 @@ import { Input } from '@/components/ui/input'
 
 const nodesApi = useNodesAPI()
 const { data: nodes } = nodesApi.fetch()
+const { mutateAsync: createNode } = nodesApi.create()
 const { mutateAsync: updateNode } = nodesApi.update()
 const { mutateAsync: deleteNode } = nodesApi.remove()
 
 const isGridView = ref(true)
+const showNewNodeDialog = ref(false)
 const editingNode = ref(null)
+
+const newNodeForm = ref({
+  hostname: '',
+  user: '',
+  publicKey: ''
+})
 
 const editForm = ref({
   hostname: '',
@@ -201,6 +239,16 @@ const handleDelete = async (id) => {
     await deleteNode(id)
   } catch (error) {
     console.error('Failed to delete node:', error)
+  }
+}
+
+const handleCreateNode = async () => {
+  try {
+    await createNode(newNodeForm.value)
+    showNewNodeDialog.value = false
+    newNodeForm.value = { hostname: '', user: '', publicKey: '' }
+  } catch (error) {
+    console.error('Failed to create node:', error)
   }
 }
 </script>
