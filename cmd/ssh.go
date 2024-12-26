@@ -17,8 +17,8 @@ var sshStartCmd = &cobra.Command{
 	Short: "Start ssh command on node.",
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := ssh.NewSSHClient(ssh.SSHClientConfig{
-			Hostname: "localhost",
-			User:     "stuart",
+			Hostname: cmd.Flag("hostname").Value.String(),
+			User:     cmd.Flag("user").Value.String(),
 		})
 		if err != nil {
 			log.Fatal(err)
@@ -34,8 +34,8 @@ var sshRunCmd = &cobra.Command{
 	Short: "Run ssh command on node.",
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := ssh.NewSSHClient(ssh.SSHClientConfig{
-			Hostname: "localhost",
-			User:     "stuart",
+			Hostname: cmd.Flag("hostname").Value.String(),
+			User:     cmd.Flag("user").Value.String(),
 		})
 		if err != nil {
 			log.Fatal(err)
@@ -47,6 +47,8 @@ var sshRunCmd = &cobra.Command{
 }
 
 func init() {
+	sshCmd.PersistentFlags().StringP("hostname", "h", "", "Hostname of the node")
+	sshCmd.PersistentFlags().StringP("user", "u", "", "User of the node")
 	sshCmd.AddCommand(sshStartCmd)
 	sshCmd.AddCommand(sshRunCmd)
 	rootCmd.AddCommand(sshCmd)
