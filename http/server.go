@@ -12,8 +12,6 @@ type Server struct {
 
 func NewServer() *Server {
 	router := gin.Default()
-	router.Static("/static", "./static")
-	router.LoadHTMLGlob("templates/**/*")
 	return &Server{router: router}
 }
 
@@ -31,7 +29,7 @@ func (s *Server) Start() {
 			c.JSON(500, gin.H{"error": result.Error.Error()})
 			return
 		}
-		c.JSON(200, gin.H{"nodes": nodes})
+		c.JSON(200, nodes)
 	})
 
 	s.router.POST("/nodes", func(c *gin.Context) {
@@ -41,7 +39,8 @@ func (s *Server) Start() {
 			return
 		}
 		db.Client.Create(&node)
-		c.JSON(200, gin.H{"message": "Node created"})
+		c.Header("X-Message", "Node created")
+		c.Status(200)
 	})
 
 	s.router.PUT("/nodes/:id", func(c *gin.Context) {
@@ -52,13 +51,15 @@ func (s *Server) Start() {
 			return
 		}
 		db.Client.Model(&db.Node{}).Where("id = ?", id).Updates(&node)
-		c.JSON(200, gin.H{"message": "Node updated"})
+		c.Header("X-Message", "Node updated")
+		c.Status(200)
 	})
 
 	s.router.DELETE("/nodes/:id", func(c *gin.Context) {
 		id := c.Param("id")
 		db.Client.Delete(&db.Node{}, id)
-		c.JSON(200, gin.H{"message": "Node deleted"})
+		c.Header("X-Message", "Node deleted")
+		c.Status(200)
 	})
 
 	s.router.Run()
