@@ -10,11 +10,27 @@ const router = createRouter({
       component: DefaultLayout,
       children: [
         {
-          path: '',
+          path: 'nodes',
           name: 'Nodes',
           component: Nodes,
           meta: {
             title: 'Nodes'
+          }
+        },
+        {
+          path: 'tasks',
+          name: 'Tasks',
+          component: Nodes,
+          meta: {
+            title: 'Tasks'
+          }
+        },
+        {
+          path: 'settings',
+          name: 'Settings',
+          component: Nodes,
+          meta: {
+            title: 'Settings'
           }
         },
       ]
