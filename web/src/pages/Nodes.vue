@@ -19,10 +19,29 @@
             <FontAwesomeIcon icon="pen-to-square" />
             Edit
           </Button>
-          <Button variant="destructive" @click="deleteNode(node.id)">
-            <FontAwesomeIcon icon="trash" />
-            Delete
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm">
+                <FontAwesomeIcon icon="trash" />
+                Delete
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the node.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction class="bg-red-500" @click="deleteNode(node.id)">
+                  <FontAwesomeIcon icon="trash" />
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardFooter>
       </Card>
     </div>
@@ -47,10 +66,29 @@
                 <FontAwesomeIcon icon="pen-to-square" />
                 Edit
               </Button>
-              <Button variant="destructive" size="sm" @click="deleteNode(node.id)">
-                <FontAwesomeIcon icon="trash" />
-                Delete
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm">
+                    <FontAwesomeIcon icon="trash" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete the node.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction class="bg-red-500" @click="deleteNode(node.id)">
+                      <FontAwesomeIcon icon="trash" />
+                      Continue
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </TableCell>
           </TableRow>
         </TableBody>
@@ -79,6 +117,17 @@ import {
   TableRow,
   TableCell,
 } from '@/components/ui/table'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 
 const isGridView = ref(true)
 const showModal = ref(false)
@@ -101,8 +150,16 @@ const editNode = (node) => {
   console.log('Edit node:', node)
 }
 
-const deleteNode = (id) => {
-  // TODO: Implement delete functionality
-  console.log('Delete node:', id)
+const nodeToDelete = ref(null)
+
+const deleteNode = async (id) => {
+  try {
+    await nodesApi.delete(id)
+    // Refresh the nodes list after deletion
+    nodesApi.fetch()
+  } catch (error) {
+    console.error('Failed to delete node:', error)
+    // You might want to show an error toast here
+  }
 }
 </script>
