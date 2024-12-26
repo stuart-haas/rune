@@ -15,7 +15,7 @@
           <CardDescription>Public Key: {{ node.PublicKey }}</CardDescription>
         </CardHeader>
         <CardFooter class="flex justify-end space-x-2">
-          <Button variant="outline" @click="editNode(node)">
+          <Button variant="outline" @click="handleEdit(node)">
             <FontAwesomeIcon icon="pen-to-square" />
             Edit
           </Button>
@@ -35,7 +35,7 @@
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction class="bg-red-500" @click="deleteNode(node.id)">
+                <AlertDialogAction class="bg-red-500" @click="handleDelete(node.id)">
                   <FontAwesomeIcon icon="trash" />
                   Continue
                 </AlertDialogAction>
@@ -62,7 +62,7 @@
             <TableCell>{{ node.User }}</TableCell>
             <TableCell class="font-mono text-sm">{{ node.PublicKey }}</TableCell>
             <TableCell class="text-right space-x-2">
-              <Button variant="outline" size="sm" @click="editNode(node)">
+              <Button variant="outline" size="sm" @click="handleEdit(node)">
                 <FontAwesomeIcon icon="pen-to-square" />
                 Edit
               </Button>
@@ -82,7 +82,7 @@
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction class="bg-red-500" @click="deleteNode(node.id)">
+                    <AlertDialogAction class="bg-red-500" @click="handleDelete(node.id)">
                       <FontAwesomeIcon icon="trash" />
                       Continue
                     </AlertDialogAction>
@@ -94,6 +94,32 @@
         </TableBody>
       </Table>
     </div>
+
+    <Dialog :open="!!editingNode" @update:open="editingNode = null">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Node</DialogTitle>
+        </DialogHeader>
+        <div class="grid gap-4 py-4">
+          <div class="grid gap-2">
+            <label for="hostname">Hostname</label>
+            <Input id="hostname" v-model="editForm.hostname" />
+          </div>
+          <div class="grid gap-2">
+            <label for="user">User</label>
+            <Input id="user" v-model="editForm.user" />
+          </div>
+          <div class="grid gap-2">
+            <label for="publicKey">Public Key</label>
+            <Input id="publicKey" v-model="editForm.publicKey" />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" @click="editingNode = null">Cancel</Button>
+          <Button @click="handleSave">Save changes</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>
 
@@ -128,38 +154,53 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-
-const isGridView = ref(true)
-const showModal = ref(false)
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 
 const nodesApi = useNodesAPI()
 const { data: nodes } = nodesApi.fetch()
+const { mutateAsync: updateNode } = nodesApi.update()
+const { mutateAsync: deleteNode } = nodesApi.remove()
 
-const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+const isGridView = ref(true)
+const editingNode = ref(null)
+
+const editForm = ref({
+  hostname: '',
+  user: '',
+  publicKey: ''
+})
+
+const handleEdit = (node) => {
+  console.log('Editing node:', node)
+  editingNode.value = node
+  editForm.value = {
+    hostname: node.Hostname,
+    user: node.User,
+    publicKey: node.PublicKey
+  }
 }
 
-const editNode = (node) => {
-  // TODO: Implement edit functionality
-  console.log('Edit node:', node)
-}
-
-const nodeToDelete = ref(null)
-
-const deleteNode = async (id) => {
+const handleSave = async () => {
   try {
-    await nodesApi.delete(id)
-    // Refresh the nodes list after deletion
-    nodesApi.fetch()
+    await updateNode({ ...editForm.value, id: editingNode.value.ID })
+    editingNode.value = null
+  } catch (error) {
+    console.error('Failed to update node:', error)
+  }
+}
+
+const handleDelete = async (id) => {
+  try {
+    await deleteNode(id)
   } catch (error) {
     console.error('Failed to delete node:', error)
-    // You might want to show an error toast here
   }
 }
 </script>

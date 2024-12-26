@@ -40,7 +40,7 @@ func (s *Server) Start() {
 		}
 		db.Client.Create(&node)
 		c.Header("X-Message", "Node created")
-		c.Status(200)
+		c.JSON(200, node)
 	})
 
 	s.router.PUT("/nodes/:id", func(c *gin.Context) {
@@ -52,7 +52,7 @@ func (s *Server) Start() {
 		}
 		db.Client.Model(&db.Node{}).Where("id = ?", id).Updates(&node)
 		c.Header("X-Message", "Node updated")
-		c.Status(200)
+		c.JSON(200, node)
 	})
 
 	s.router.DELETE("/nodes/:id", func(c *gin.Context) {
