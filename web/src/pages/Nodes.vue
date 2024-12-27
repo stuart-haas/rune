@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="mb-4 flex justify-between">
-      <Button variant="default" @click="showNewNodeDialog = true">
+      <Button variant="default" @click="addingNode = true">
         <FontAwesomeIcon icon="plus" class="mr-2" />
         New Node
       </Button>
@@ -102,7 +102,7 @@
           <DialogTitle>Edit Node</DialogTitle>
         </DialogHeader>
         <form>
-          <FormField v-slot="{ componentField }" name="hostname">
+          <FormField v-slot="{ componentField }" name="Hostname">
             <FormItem>
               <FormLabel>Hostname</FormLabel>
               <FormControl>
@@ -111,7 +111,7 @@
               <FormMessage />
             </FormItem>
           </FormField>
-          <FormField v-slot="{ componentField }" name="user">
+          <FormField v-slot="{ componentField }" name="User">
             <FormItem>
               <FormLabel>User</FormLabel>
               <FormControl>
@@ -128,13 +128,13 @@
       </DialogContent>
     </Dialog>
 
-    <Dialog :open="showNewNodeDialog" @update:open="showNewNodeDialog = false">
+    <Dialog :open="addingNode" @update:open="addingNode = false">
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Node</DialogTitle>
         </DialogHeader>
         <form>
-          <FormField v-slot="{ componentField }" name="hostname">
+          <FormField v-slot="{ componentField }" name="Hostname">
             <FormItem>
               <FormLabel>Hostname</FormLabel>
               <FormControl>
@@ -143,7 +143,7 @@
               <FormMessage />
             </FormItem>
           </FormField>
-          <FormField v-slot="{ componentField }" name="user">
+          <FormField v-slot="{ componentField }" name="User">
             <FormItem>
               <FormLabel>User</FormLabel>
               <FormControl>
@@ -154,7 +154,7 @@
           </FormField>
         </form>
         <DialogFooter>
-          <Button variant="outline" @click="showNewNodeDialog = false">Cancel</Button>
+          <Button variant="outline" @click="addingNode = false">Cancel</Button>
           <Button type="submit" @click="handleCreate">Create</Button>
         </DialogFooter>
       </DialogContent>
@@ -206,8 +206,8 @@ import { useForm } from 'vee-validate'
 import { object, string } from 'yup'
 
 const formSchema = object({
-  hostname: string().required('Hostname is required'),
-  user: string().required('User is required'),
+  Hostname: string().required('Hostname is required'),
+  User: string().required('User is required'),
 })
 
 const form = useForm({
@@ -221,41 +221,25 @@ const { mutateAsync: updateNode } = nodesApi.update()
 const { mutateAsync: deleteNode } = nodesApi.remove()
 
 const isGridView = ref(true)
-const showNewNodeDialog = ref(false)
+const addingNode = ref(false)
 const editingNode = ref(null)
 
 const handleEdit = (node) => {
   editingNode.value = node
-  form.setValues({
-    hostname: node.Hostname,
-    user: node.User,
-  })
+  form.setValues(node)
 }
 
 const handleCreate = form.handleSubmit(async (payload) => {
-  try {
-    await createNode(payload)
-    showNewNodeDialog.value = false
-  } catch (error) {
-    console.error('Failed to create node:', error)
-  }
+  await createNode(payload)
+  addingNode.value = false
 })
 
 const handleUpdate = form.handleSubmit(async (payload) => {
-  console.log('Updating node:', payload)
-  try {
-    await updateNode({ ...payload, id: editingNode.value.ID })
-    editingNode.value = null
-  } catch (error) {
-    console.error('Failed to update node:', error)
-  }
+  await updateNode({ ...payload, id: editingNode.value.ID })
+  editingNode.value = null
 })
 
 const handleDelete = async (id) => {
-  try {
-    await deleteNode(id)
-  } catch (error) {
-    console.error('Failed to delete node:', error)
-  }
+  await deleteNode(id)
 }
 </script>
