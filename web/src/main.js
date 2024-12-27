@@ -3,10 +3,10 @@ import './assets/index.css'
 import App from './App.vue'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faPenToSquare, faTrash, faTableCells, faTableList, faPlus, faUser, faCog, faTimes, faLink, faUnlink } from '@fortawesome/free-solid-svg-icons'
+import { faPenToSquare, faTrash, faTableCells, faTableList, faPlus, faUser, faCog, faTimes, faLink, faUnlink, faSync } from '@fortawesome/free-solid-svg-icons'
 import router from './router'
 
-library.add(faPenToSquare, faTrash, faTableCells, faTableList, faPlus, faUser, faCog, faTimes, faLink, faUnlink)
+library.add(faPenToSquare, faTrash, faTableCells, faTableList, faPlus, faUser, faCog, faTimes, faLink, faUnlink, faSync)
 
 const app = createApp(App)
 

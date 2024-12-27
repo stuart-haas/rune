@@ -24,6 +24,26 @@ func (s *Server) RegisterOAuthRoutes() {
 			return
 		}
 		db.Client.Create(&client)
+		c.Header("X-Message", "OAuth client created")
 		c.JSON(200, client)
+	})
+
+	s.router.PUT("/oauth/clients/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		var client db.OAuthClient
+		if err := c.ShouldBindJSON(&client); err != nil {
+			c.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+		db.Client.Model(&db.OAuthClient{}).Where("id = ?", id).Updates(&client)
+		c.Header("X-Message", "OAuth client updated")
+		c.JSON(200, client)
+	})
+
+	s.router.DELETE("/oauth/clients/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		db.Client.Delete(&db.OAuthClient{}, id)
+		c.Header("X-Message", "OAuth client deleted")
+		c.Status(200)
 	})
 }

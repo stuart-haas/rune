@@ -45,7 +45,7 @@ export const useNodesAPI = () => {
       }
     }),
 
-    remove: () => useMutation({
+    delete: () => useMutation({
       mutationFn: deleteNode,
       onSuccess: () => {
         queryClient.invalidateQueries(['nodes'])

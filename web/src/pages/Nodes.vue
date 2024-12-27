@@ -1,165 +1,166 @@
 <template>
-  <div class="page">
-    <div class="mb-4 flex justify-between">
-      <Button variant="default" @click="addingNode = true">
-        <FontAwesomeIcon icon="plus" class="mr-2" />
-        New Node
-      </Button>
-      <Button variant="outline" @click="isGridView = !isGridView">
-        <FontAwesomeIcon :icon="isGridView ? 'table-list' : 'table-cells'" class="mr-2" />
-        {{ isGridView ? 'Table View' : 'Grid View' }}
-      </Button>
-    </div>
-
-    <div v-if="isGridView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <Card v-for="node in nodes" :key="node.id" class="w-full">
-        <CardHeader>
-          <CardTitle>{{ node.Hostname }}</CardTitle>
-          <CardDescription>User: {{ node.User }}</CardDescription>
-        </CardHeader>
-        <CardFooter class="flex justify-end space-x-2">
-          <Button variant="outline" @click="handleEdit(node)">
-            <FontAwesomeIcon icon="pen-to-square" />
-            Edit
-          </Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="sm">
-                <FontAwesomeIcon icon="trash" />
-                Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the node.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction class="bg-red-500" @click="handleDelete(node.ID)">
-                  <FontAwesomeIcon icon="trash" />
-                  Continue
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </CardFooter>
-      </Card>
-    </div>
-
-    <div v-else class="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Hostname</TableHead>
-            <TableHead>User</TableHead>
-            <TableHead class="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow v-for="node in nodes" :key="node.id">
-            <TableCell>{{ node.Hostname }}</TableCell>
-            <TableCell>{{ node.User }}</TableCell>
-            <TableCell class="text-right space-x-2">
-              <Button variant="outline" size="sm" @click="handleEdit(node)">
-                <FontAwesomeIcon icon="pen-to-square" />
-                Edit
-              </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="sm">
-                    <FontAwesomeIcon icon="trash" />
-                    Delete
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete the node.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction class="bg-red-500" @click="handleDelete(node.ID)">
-                      <FontAwesomeIcon icon="trash" />
-                      Continue
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </div>
-
-    <Dialog :open="!!editingNode" @update:open="editingNode = null">
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit Node</DialogTitle>
-        </DialogHeader>
-        <form>
-          <FormField v-slot="{ componentField }" name="Hostname">
-            <FormItem>
-              <FormLabel>Hostname</FormLabel>
-              <FormControl>
-                <Input type="text" placeholder="192.168.1.1" v-bind="componentField" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <FormField v-slot="{ componentField }" name="User">
-            <FormItem>
-              <FormLabel>User</FormLabel>
-              <FormControl>
-                <Input type="text" placeholder="user" v-bind="componentField" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-        </form>
-        <DialogFooter>
-          <Button variant="outline" @click="editingNode = null">Cancel</Button>
-          <Button type="submit" @click="handleUpdate">Update</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-
-    <Dialog :open="addingNode" @update:open="addingNode = false">
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add Node</DialogTitle>
-        </DialogHeader>
-        <form>
-          <FormField v-slot="{ componentField }" name="Hostname">
-            <FormItem>
-              <FormLabel>Hostname</FormLabel>
-              <FormControl>
-                <Input type="text" placeholder="192.168.1.1" v-bind="componentField" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <FormField v-slot="{ componentField }" name="User">
-            <FormItem>
-              <FormLabel>User</FormLabel>
-              <FormControl>
-                <Input type="text" placeholder="user" v-bind="componentField" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-        </form>
-        <DialogFooter>
-          <Button variant="outline" @click="addingNode = false">Cancel</Button>
-          <Button type="submit" @click="handleCreate">Create</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+  <div class="mb-4 flex justify-between">
+    <Button variant="default" @click="addingNode = true">
+      <FontAwesomeIcon icon="plus" class="mr-2" />
+      New Node
+    </Button>
+    <Button variant="outline" @click="isGridView = !isGridView">
+      <FontAwesomeIcon :icon="isGridView ? 'table-list' : 'table-cells'" class="mr-2" />
+      {{ isGridView ? 'Table View' : 'Grid View' }}
+    </Button>
   </div>
+
+  <div v-if="isGridView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <Card v-for="node in nodes" :key="node.id" class="w-full">
+      <CardHeader>
+        <CardTitle>{{ node.Hostname }}</CardTitle>
+        <CardDescription>User: {{ node.User }}</CardDescription>
+        <CardDescription>Last Sync: {{ node.LastSync ? formatDate(node.LastSync) : 'Never' }}</CardDescription>
+      </CardHeader>
+      <CardFooter class="flex justify-end space-x-2">
+        <Button variant="outline" @click="handleEdit(node)">
+          <FontAwesomeIcon icon="pen-to-square" />
+          Edit
+        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" size="sm">
+              <FontAwesomeIcon icon="trash" />
+              Delete
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the node.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction class="bg-red-500" @click="handleDelete(node.ID)">
+                <FontAwesomeIcon icon="trash" />
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </CardFooter>
+    </Card>
+  </div>
+
+  <div v-else class="rounded-md border">
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Hostname</TableHead>
+          <TableHead>User</TableHead>
+          <TableHead>Last Sync</TableHead>
+          <TableHead class="text-right">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow v-for="node in nodes" :key="node.id">
+          <TableCell>{{ node.Hostname }}</TableCell>
+          <TableCell>{{ node.User }}</TableCell>
+          <TableCell>{{ node.LastSync ? formatDate(node.LastSync) : 'Never' }}</TableCell>
+          <TableCell class="text-right space-x-2">
+            <Button variant="outline" size="sm" @click="handleEdit(node)">
+              <FontAwesomeIcon icon="pen-to-square" />
+              Edit
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm">
+                  <FontAwesomeIcon icon="trash" />
+                  Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the node.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction class="bg-red-500" @click="handleDelete(node.ID)">
+                    <FontAwesomeIcon icon="trash" />
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <Dialog :open="!!editingNode" @update:open="editingNode = null">
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Edit Node</DialogTitle>
+      </DialogHeader>
+      <form>
+        <FormField v-slot="{ componentField }" name="Hostname">
+          <FormItem>
+            <FormLabel>Hostname</FormLabel>
+            <FormControl>
+              <Input type="text" placeholder="192.168.1.1" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        <FormField v-slot="{ componentField }" name="User">
+          <FormItem>
+            <FormLabel>User</FormLabel>
+            <FormControl>
+              <Input type="text" placeholder="user" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+      </form>
+      <DialogFooter>
+        <Button variant="outline" @click="editingNode = null">Cancel</Button>
+        <Button type="submit" @click="handleUpdate">Update</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+
+  <Dialog :open="addingNode" @update:open="addingNode = false">
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Add Node</DialogTitle>
+      </DialogHeader>
+      <form>
+        <FormField v-slot="{ componentField }" name="Hostname">
+          <FormItem>
+            <FormLabel>Hostname</FormLabel>
+            <FormControl>
+              <Input type="text" placeholder="192.168.1.1" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        <FormField v-slot="{ componentField }" name="User">
+          <FormItem>
+            <FormLabel>User</FormLabel>
+            <FormControl>
+              <Input type="text" placeholder="user" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+      </form>
+      <DialogFooter>
+        <Button variant="outline" @click="addingNode = false">Cancel</Button>
+        <Button type="submit" @click="handleCreate">Create</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
 </template>
 
 <script setup>
@@ -205,6 +206,26 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/comp
 import { useForm } from 'vee-validate'
 import { object, string } from 'yup'
 
+const formatDate = (dateString) => {
+  try {
+    const date = new Date(dateString)
+    if (isNaN(date)) return 'Invalid Date'
+    
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }).format(date)
+  } catch (error) {
+    console.error('Error formatting date:', error)
+    return 'Invalid Date'
+  }
+}
+
 const formSchema = object({
   Hostname: string().required('Hostname is required'),
   User: string().required('User is required'),
@@ -218,7 +239,7 @@ const nodesApi = useNodesAPI()
 const { data: nodes } = nodesApi.fetch()
 const { mutateAsync: createNode } = nodesApi.create()
 const { mutateAsync: updateNode } = nodesApi.update()
-const { mutateAsync: deleteNode } = nodesApi.remove()
+const { mutateAsync: deleteNode } = nodesApi.delete()
 
 const isGridView = ref(true)
 const addingNode = ref(false)

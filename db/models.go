@@ -1,11 +1,18 @@
 package db
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Node struct {
 	gorm.Model
 	Hostname  string
 	User      string
+	ExternalID string
+	ExternalProvider string
+	LastSync time.Time
 }
 
 type OAuthClient struct {
