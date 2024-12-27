@@ -25,14 +25,8 @@ var createNodeCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		publicKey, err := cmd.Flags().GetString("public-key")
-		if err != nil {
-			log.Fatal(err)
-		}
-		node := db.Node{Hostname: hostname, User: user, PublicKey: publicKey}
-		db.Client.Create(&node)
+		db.Client.Create(&db.Node{Hostname: hostname, User: user})
 		log.Println("Node created")
-		log.Println(node)
 	},
 }
 
@@ -53,7 +47,6 @@ func init() {
 	nodeCmd.AddCommand(createNodeCmd)
 	createNodeCmd.Flags().StringP("hostname", "n", "", "Hostname")
 	createNodeCmd.Flags().StringP("user", "u", "", "User")
-	createNodeCmd.Flags().StringP("public-key", "p", "", "Public key")
 	nodeCmd.AddCommand(deleteNodeCmd)
 	rootCmd.AddCommand(nodeCmd)
 }

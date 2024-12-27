@@ -6,7 +6,6 @@ type Node struct {
 	gorm.Model
 	Hostname  string
 	User      string
-	PublicKey string
 }
 
 type OAuthClient struct {

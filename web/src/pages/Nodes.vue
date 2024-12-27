@@ -16,7 +16,6 @@
         <CardHeader>
           <CardTitle>{{ node.Hostname }}</CardTitle>
           <CardDescription>User: {{ node.User }}</CardDescription>
-          <CardDescription>Public Key: {{ node.PublicKey }}</CardDescription>
         </CardHeader>
         <CardFooter class="flex justify-end space-x-2">
           <Button variant="outline" @click="handleEdit(node)">
@@ -56,7 +55,6 @@
           <TableRow>
             <TableHead>Hostname</TableHead>
             <TableHead>User</TableHead>
-            <TableHead>Public Key</TableHead>
             <TableHead class="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -64,7 +62,6 @@
           <TableRow v-for="node in nodes" :key="node.id">
             <TableCell>{{ node.Hostname }}</TableCell>
             <TableCell>{{ node.User }}</TableCell>
-            <TableCell class="font-mono text-sm">{{ node.PublicKey }}</TableCell>
             <TableCell class="text-right space-x-2">
               <Button variant="outline" size="sm" @click="handleEdit(node)">
                 <FontAwesomeIcon icon="pen-to-square" />
@@ -104,23 +101,29 @@
         <DialogHeader>
           <DialogTitle>Edit Node</DialogTitle>
         </DialogHeader>
-        <div class="grid gap-4 py-4">
-          <div class="grid gap-2">
-            <label for="hostname">Hostname</label>
-            <Input id="hostname" v-model="editForm.hostname" />
-          </div>
-          <div class="grid gap-2">
-            <label for="user">User</label>
-            <Input id="user" v-model="editForm.user" />
-          </div>
-          <div class="grid gap-2">
-            <label for="publicKey">Public Key</label>
-            <Input id="publicKey" v-model="editForm.publicKey" />
-          </div>
-        </div>
+        <form>
+          <FormField v-slot="{ componentField }" name="hostname">
+            <FormItem>
+              <FormLabel>Hostname</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="192.168.1.1" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="user">
+            <FormItem>
+              <FormLabel>User</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="user" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </form>
         <DialogFooter>
           <Button variant="outline" @click="editingNode = null">Cancel</Button>
-          <Button @click="handleSave">Save changes</Button>
+          <Button type="submit" @click="handleUpdate">Update</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -128,25 +131,31 @@
     <Dialog :open="showNewNodeDialog" @update:open="showNewNodeDialog = false">
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Node</DialogTitle>
+          <DialogTitle>Add Node</DialogTitle>
         </DialogHeader>
-        <div class="grid gap-4 py-4">
-          <div class="grid gap-2">
-            <label for="new-hostname">Hostname</label>
-            <Input id="new-hostname" v-model="newNodeForm.hostname" />
-          </div>
-          <div class="grid gap-2">
-            <label for="new-user">User</label>
-            <Input id="new-user" v-model="newNodeForm.user" />
-          </div>
-          <div class="grid gap-2">
-            <label for="new-publicKey">Public Key</label>
-            <Input id="new-publicKey" v-model="newNodeForm.publicKey" />
-          </div>
-        </div>
+        <form>
+          <FormField v-slot="{ componentField }" name="hostname">
+            <FormItem>
+              <FormLabel>Hostname</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="192.168.1.1" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="user">
+            <FormItem>
+              <FormLabel>User</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="user" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </form>
         <DialogFooter>
           <Button variant="outline" @click="showNewNodeDialog = false">Cancel</Button>
-          <Button @click="handleCreate">Create</Button>
+          <Button type="submit" @click="handleCreate">Create</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -192,6 +201,18 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
+import { useForm } from 'vee-validate'
+import { object, string } from 'yup'
+
+const formSchema = object({
+  hostname: string().required('Hostname is required'),
+  user: string().required('User is required'),
+})
+
+const form = useForm({
+  validationSchema: formSchema,
+})
 
 const nodesApi = useNodesAPI()
 const { data: nodes } = nodesApi.fetch()
@@ -203,47 +224,32 @@ const isGridView = ref(true)
 const showNewNodeDialog = ref(false)
 const editingNode = ref(null)
 
-const newNodeForm = ref({
-  hostname: '',
-  user: '',
-  publicKey: ''
-})
+const handleEdit = (node) => {
+  editingNode.value = node
+  form.setValues({
+    hostname: node.Hostname,
+    user: node.User,
+  })
+}
 
-const editForm = ref({
-  hostname: '',
-  user: '',
-  publicKey: ''
-})
-
-
-const handleCreate = async () => {
+const handleCreate = form.handleSubmit(async (payload) => {
   try {
-    await createNode(newNodeForm.value)
+    await createNode(payload)
     showNewNodeDialog.value = false
-    newNodeForm.value = { hostname: '', user: '', publicKey: '' }
   } catch (error) {
     console.error('Failed to create node:', error)
   }
-}
+})
 
-const handleEdit = (node) => {
-  console.log('Editing node:', node)
-  editingNode.value = node
-  editForm.value = {
-    hostname: node.Hostname,
-    user: node.User,
-    publicKey: node.PublicKey
-  }
-}
-
-const handleSave = async () => {
+const handleUpdate = form.handleSubmit(async (payload) => {
+  console.log('Updating node:', payload)
   try {
-    await updateNode({ ...editForm.value, id: editingNode.value.ID })
+    await updateNode({ ...payload, id: editingNode.value.ID })
     editingNode.value = null
   } catch (error) {
     console.error('Failed to update node:', error)
   }
-}
+})
 
 const handleDelete = async (id) => {
   try {
