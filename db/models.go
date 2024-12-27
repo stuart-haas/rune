@@ -8,3 +8,12 @@ type Node struct {
 	User      string
 	PublicKey string
 }
+
+type OAuthClient struct {
+	gorm.Model
+	Name        string
+	Description string
+	IsConnected bool
+	ClientID    string
+	ClientSecret string
+}
