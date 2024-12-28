@@ -16,6 +16,15 @@
         <CardTitle>{{ node.Hostname }}</CardTitle>
         <CardDescription>User: {{ node.User }}</CardDescription>
         <CardDescription>Last Sync: {{ node.LastSync ? formatDate(node.LastSync) : 'Never' }}</CardDescription>
+        <div class="flex flex-wrap gap-2 mt-2">
+          <span 
+            v-for="tag in node.Tags" 
+            :key="tag.Name"
+            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+          >
+            {{ tag.Name }}
+          </span>
+        </div>
       </CardHeader>
       <CardFooter class="flex justify-end space-x-2">
         <Button variant="outline" @click="handleEdit(node)">
@@ -56,6 +65,7 @@
           <TableHead>Hostname</TableHead>
           <TableHead>User</TableHead>
           <TableHead>Last Sync</TableHead>
+          <TableHead>Tags</TableHead>
           <TableHead class="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -64,6 +74,17 @@
           <TableCell>{{ node.Hostname }}</TableCell>
           <TableCell>{{ node.User }}</TableCell>
           <TableCell>{{ node.LastSync ? formatDate(node.LastSync) : 'Never' }}</TableCell>
+          <TableCell>
+            <div class="flex flex-wrap gap-2">
+              <span 
+                v-for="tag in node.Tags" 
+                :key="tag.Name"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+              >
+                {{ tag.Name }}
+              </span>
+            </div>
+          </TableCell>
           <TableCell class="text-right space-x-2">
             <Button variant="outline" size="sm" @click="handleEdit(node)">
               <FontAwesomeIcon icon="pen-to-square" />
