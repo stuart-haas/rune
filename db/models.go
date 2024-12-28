@@ -8,24 +8,24 @@ import (
 
 type Node struct {
 	gorm.Model
-	Hostname          string    `json:"hostname"`
-	User              string    `json:"user"`
-	ExternalID        string    `json:"externalId"`
-	ExternalProvider  string    `json:"externalProvider"`
-	LastSync          time.Time `json:"lastSync"`
-	Tags             []Tag     `gorm:"many2many:node_tags;" json:"tags"`
+	Hostname          string
+	User              string
+	ExternalID        string
+	ExternalProvider  string
+	LastSync          time.Time
+	Tags             []NodeTag  `gorm:"many2many:nodes_tags;"`
 }
 
-type Tag struct {
+type NodeTag struct {
 	gorm.Model
-	Name string `json:"name"`
+	Name string
 }
 
 type OAuthClient struct {
 	gorm.Model
-	Name          string `json:"name"`
-	Description   string `json:"description"`
-	IsConnected   bool   `json:"isConnected"`
-	ClientID      string `json:"clientId"`
-	ClientSecret  string `json:"clientSecret"`
+	Name          string
+	Description   string
+	IsConnected   bool
+	ClientID      string
+	ClientSecret  string
 }

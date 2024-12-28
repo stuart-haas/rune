@@ -13,9 +13,9 @@
   <div v-if="isGridView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     <Card v-for="node in nodes" :key="node.id" class="w-full">
       <CardHeader>
-        <CardTitle>{{ node.hostname }}</CardTitle>
-        <CardDescription>User: {{ node.user }}</CardDescription>
-        <CardDescription>Last Sync: {{ node.lastSync ? formatDate(node.lastSync) : 'Never' }}</CardDescription>
+        <CardTitle>{{ node.Hostname }}</CardTitle>
+        <CardDescription>User: {{ node.User }}</CardDescription>
+        <CardDescription>Last Sync: {{ node.LastSync ? formatDate(node.LastSync) : 'Never' }}</CardDescription>
       </CardHeader>
       <CardFooter class="flex justify-end space-x-2">
         <Button variant="outline" @click="handleEdit(node)">
@@ -62,8 +62,8 @@
       <TableBody>
         <TableRow v-for="node in nodes" :key="node.id">
           <TableCell>{{ node.Hostname }}</TableCell>
-          <TableCell>{{ node.user }}</TableCell>
-          <TableCell>{{ node.lastSync ? formatDate(node.lastSync) : 'Never' }}</TableCell>
+          <TableCell>{{ node.User }}</TableCell>
+          <TableCell>{{ node.LastSync ? formatDate(node.LastSync) : 'Never' }}</TableCell>
           <TableCell class="text-right space-x-2">
             <Button variant="outline" size="sm" @click="handleEdit(node)">
               <FontAwesomeIcon icon="pen-to-square" />
@@ -104,7 +104,7 @@
         <DialogTitle>Edit Node</DialogTitle>
       </DialogHeader>
       <form>
-        <FormField v-slot="{ componentField }" name="hostname">
+        <FormField v-slot="{ componentField }" name="Hostname">
           <FormItem>
             <FormLabel>Hostname</FormLabel>
             <FormControl>
@@ -113,7 +113,7 @@
             <FormMessage />
           </FormItem>
         </FormField>
-        <FormField v-slot="{ componentField }" name="user">
+        <FormField v-slot="{ componentField }" name="User">
           <FormItem>
             <FormLabel>User</FormLabel>
             <FormControl>
@@ -122,7 +122,7 @@
             <FormMessage />
           </FormItem>
         </FormField>
-        <FormField v-slot="{ value }" name="tags">
+        <FormField v-slot="{ value }" name="Tags">
           <FormItem>
             <FormLabel>Tags</FormLabel>
             <FormControl>
@@ -165,6 +165,21 @@
             <FormLabel>User</FormLabel>
             <FormControl>
               <Input type="text" placeholder="user" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        <FormField v-slot="{ value }" name="Tags">
+          <FormItem>
+            <FormLabel>Tags</FormLabel>
+            <FormControl>
+              <TagsInput :model-value="value">
+                <TagsInputItem v-for="item in value" :key="item" :value="item">
+                  <TagsInputItemText />
+                  <TagsInputItemDelete />
+                </TagsInputItem>
+                <TagsInputInput placeholder="Tags..." />
+              </TagsInput>
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -243,13 +258,16 @@ const formatDate = (dateString) => {
 }
 
 const formSchema = object({
-  hostname: string().required('Hostname is required'),
-  user: string().required('User is required'),
-  tags: array().of(string()).nullable().default([]),
+  Hostname: string().required('Hostname is required'),
+  User: string().optional(),
+  Tags: array().of(string()).nullable().default([]),
 })
 
 const form = useForm({
   validationSchema: formSchema,
+  initialValues: {
+    Tags: [],
+  }
 })
 
 const nodesApi = useNodesAPI()
@@ -264,14 +282,14 @@ const editingNode = ref(null)
 
 const handleEdit = (node) => {
   editingNode.value = node
-  const formattedTags = node.tags ? node.tags.map(tag => tag.name) : []
-  form.setValues({ ...node, tags: formattedTags })
+  const formattedTags = node.Tags ? node.Tags.map(tag => tag.Name) : []
+  form.setValues({ ...node, Tags: formattedTags })
 }
 
 const handleCreate = form.handleSubmit(async (payload) => {
   const formattedPayload = {
     ...payload,
-    tags: payload.tags ? payload.tags.map(tag => ({ name: tag })) : []
+    Tags: payload.Tags ? payload.Tags.map(tag => ({ Name: tag })) : []
   }
   await createNode(formattedPayload)
   addingNode.value = false
@@ -280,8 +298,8 @@ const handleCreate = form.handleSubmit(async (payload) => {
 const handleUpdate = form.handleSubmit(async (payload) => {
   const formattedPayload = {
     ...payload,
-    tags: payload.tags ? payload.tags.map(tag => ({ name: tag })) : [],
-    id: editingNode.value.ID
+    Tags: payload.Tags ? payload.Tags.map(tag => ({ Name: tag })) : [],
+    ID: editingNode.value.ID
   }
   await updateNode(formattedPayload)
   editingNode.value = null

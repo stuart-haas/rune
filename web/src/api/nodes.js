@@ -7,13 +7,18 @@ const fetchNodes = async () => {
   return data
 }
 
+const fetchNodeTags = async () => {
+  const { data } = await client.get('/nodes/tags')
+  return data
+}
+
 const createNode = async (node) => {
   const { data } = await client.post('/nodes', node)
   return data
 }
 
 const updateNode = async (node) => {
-  const { data } = await client.put(`/nodes/${node.id}`, node)
+  const { data } = await client.put(`/nodes/${node.ID}`, node)
   return data
 }
 
@@ -29,6 +34,11 @@ export const useNodesAPI = () => {
     fetch: () => useQuery({
       queryKey: ['nodes'],
       queryFn: fetchNodes,
+    }),
+
+    fetchTags: () => useQuery({
+      queryKey: ['node-tags'],
+      queryFn: fetchNodeTags,
     }),
 
     create: () => useMutation({
