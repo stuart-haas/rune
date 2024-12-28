@@ -8,12 +8,12 @@ import (
 
 type Node struct {
 	gorm.Model
-	Hostname          string
+	Hostname          string `gorm:"unique"`
 	User              string
 	ExternalID        string
 	ExternalProvider  string
 	LastSync          time.Time
-	Tags             []NodeTag  `gorm:"many2many:nodes_tags;"`
+	Tags             []NodeTag  `gorm:"many2many:nodes_tags"`
 }
 
 type NodeTag struct {
