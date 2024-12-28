@@ -34,16 +34,6 @@ func (s *Server) RegisterTailscaleRoutes() {
 		c.JSON(200, devices)
 	})
 
-	s.router.POST("/tailscale/devices/:id/sync", func(c *gin.Context) {
-		err := tailscale.NewTailscaleClient().SyncDevice(c.Param("id"))
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-		c.Header("X-Message", "Device synced")
-		c.Status(200)
-	})
-
 	s.router.POST("/tailscale/devices/sync", func(c *gin.Context) {
 		err := tailscale.NewTailscaleClient().SyncDevices()
 		if err != nil {
@@ -51,6 +41,16 @@ func (s *Server) RegisterTailscaleRoutes() {
 			return
 		}
 		c.Header("X-Message", "Devices synced")
+		c.Status(200)
+	})
+
+	s.router.POST("/tailscale/devices/:id/sync", func(c *gin.Context) {
+		err := tailscale.NewTailscaleClient().SyncDevice(c.Param("id"))
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		c.Header("X-Message", "Device synced")
 		c.Status(200)
 	})
 }

@@ -14,7 +14,7 @@ func Connect() error {
 		return err
 	}
 
-	Client.AutoMigrate(&Node{})
+	Client.AutoMigrate(&Node{}, &Tag{})
 
 	return nil
 }

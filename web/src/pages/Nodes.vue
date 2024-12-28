@@ -13,9 +13,9 @@
   <div v-if="isGridView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     <Card v-for="node in nodes" :key="node.id" class="w-full">
       <CardHeader>
-        <CardTitle>{{ node.Hostname }}</CardTitle>
-        <CardDescription>User: {{ node.User }}</CardDescription>
-        <CardDescription>Last Sync: {{ node.LastSync ? formatDate(node.LastSync) : 'Never' }}</CardDescription>
+        <CardTitle>{{ node.hostname }}</CardTitle>
+        <CardDescription>User: {{ node.user }}</CardDescription>
+        <CardDescription>Last Sync: {{ node.lastSync ? formatDate(node.lastSync) : 'Never' }}</CardDescription>
       </CardHeader>
       <CardFooter class="flex justify-end space-x-2">
         <Button variant="outline" @click="handleEdit(node)">
@@ -62,8 +62,8 @@
       <TableBody>
         <TableRow v-for="node in nodes" :key="node.id">
           <TableCell>{{ node.Hostname }}</TableCell>
-          <TableCell>{{ node.User }}</TableCell>
-          <TableCell>{{ node.LastSync ? formatDate(node.LastSync) : 'Never' }}</TableCell>
+          <TableCell>{{ node.user }}</TableCell>
+          <TableCell>{{ node.lastSync ? formatDate(node.lastSync) : 'Never' }}</TableCell>
           <TableCell class="text-right space-x-2">
             <Button variant="outline" size="sm" @click="handleEdit(node)">
               <FontAwesomeIcon icon="pen-to-square" />
@@ -104,7 +104,7 @@
         <DialogTitle>Edit Node</DialogTitle>
       </DialogHeader>
       <form>
-        <FormField v-slot="{ componentField }" name="Hostname">
+        <FormField v-slot="{ componentField }" name="hostname">
           <FormItem>
             <FormLabel>Hostname</FormLabel>
             <FormControl>
@@ -113,11 +113,26 @@
             <FormMessage />
           </FormItem>
         </FormField>
-        <FormField v-slot="{ componentField }" name="User">
+        <FormField v-slot="{ componentField }" name="user">
           <FormItem>
             <FormLabel>User</FormLabel>
             <FormControl>
               <Input type="text" placeholder="user" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        <FormField v-slot="{ value }" name="tags">
+          <FormItem>
+            <FormLabel>Tags</FormLabel>
+            <FormControl>
+              <TagsInput :model-value="value">
+                <TagsInputItem v-for="item in value" :key="item" :value="item">
+                  <TagsInputItemText />
+                  <TagsInputItemDelete />
+                </TagsInputItem>
+                <TagsInputInput placeholder="Tags..." />
+              </TagsInput>
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -201,10 +216,11 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete, TagsInputItemText } from '@/components/ui/tags-input'
 import { Input } from '@/components/ui/input'
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
 import { useForm } from 'vee-validate'
-import { object, string } from 'yup'
+import { array, object, string } from 'yup'
 
 const formatDate = (dateString) => {
   try {
@@ -227,8 +243,9 @@ const formatDate = (dateString) => {
 }
 
 const formSchema = object({
-  Hostname: string().required('Hostname is required'),
-  User: string().required('User is required'),
+  hostname: string().required('Hostname is required'),
+  user: string().required('User is required'),
+  tags: array().of(string()).nullable().default([]),
 })
 
 const form = useForm({
@@ -247,16 +264,26 @@ const editingNode = ref(null)
 
 const handleEdit = (node) => {
   editingNode.value = node
-  form.setValues(node)
+  const formattedTags = node.tags ? node.tags.map(tag => tag.name) : []
+  form.setValues({ ...node, tags: formattedTags })
 }
 
 const handleCreate = form.handleSubmit(async (payload) => {
-  await createNode(payload)
+  const formattedPayload = {
+    ...payload,
+    tags: payload.tags ? payload.tags.map(tag => ({ name: tag })) : []
+  }
+  await createNode(formattedPayload)
   addingNode.value = false
 })
 
 const handleUpdate = form.handleSubmit(async (payload) => {
-  await updateNode({ ...payload, id: editingNode.value.ID })
+  const formattedPayload = {
+    ...payload,
+    tags: payload.tags ? payload.tags.map(tag => ({ name: tag })) : [],
+    id: editingNode.value.ID
+  }
+  await updateNode(formattedPayload)
   editingNode.value = null
 })
 

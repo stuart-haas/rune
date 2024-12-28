@@ -41,9 +41,6 @@ var deleteNodeCmd = &cobra.Command{
 }
 
 func init() {
-	if err := db.Connect(); err != nil {
-		log.Fatal(err)
-	}
 	nodeCmd.AddCommand(createNodeCmd)
 	createNodeCmd.Flags().StringP("hostname", "n", "", "Hostname")
 	createNodeCmd.Flags().StringP("user", "u", "", "User")

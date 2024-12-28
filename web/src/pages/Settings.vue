@@ -38,7 +38,7 @@
       </div>
     </CardContent>
     <CardFooter class="flex flex-row gap-2">
-      <Button @click="syncDevices" :disabled="syncDevicesLoading">
+      <Button @click="syncDevices" :disabled="!devices || syncDevicesLoading">
         <FontAwesomeIcon icon="sync" class="mr-2" :class="{ 'fa-spin': syncDevicesLoading }" />
         Sync Devices
       </Button>

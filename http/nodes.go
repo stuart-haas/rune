@@ -9,12 +9,22 @@ import (
 func (s *Server) RegisterNodesRoutes() {
 	s.router.GET("/nodes", func(c *gin.Context) {
 		var nodes []db.Node
-		result := db.Client.Find(&nodes)
+		result := db.Client.Preload("Tags").Find(&nodes)
 		if result.Error != nil {
 			c.JSON(500, gin.H{"error": result.Error.Error()})
 			return
 		}
 		c.JSON(200, nodes)
+	})
+
+	s.router.GET("/nodes/tags", func(c *gin.Context) {
+		var nodeTags []db.Tag
+		result := db.Client.Preload("Tags").Find(&nodeTags)
+		if result.Error != nil {
+			c.JSON(500, gin.H{"error": result.Error.Error()})
+			return
+		}
+		c.JSON(200, nodeTags)
 	})
 
 	s.router.POST("/nodes", func(c *gin.Context) {
@@ -23,7 +33,7 @@ func (s *Server) RegisterNodesRoutes() {
 			c.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
-		db.Client.Create(&node)
+		db.Client.Create(&node).Association("Tags").Replace(node.Tags)
 		c.Header("X-Message", "Node created")
 		c.JSON(200, node)
 	})
@@ -35,7 +45,7 @@ func (s *Server) RegisterNodesRoutes() {
 			c.JSON(400, gin.H{"error": err.Error()})
 			return
 		}
-		db.Client.Model(&db.Node{}).Where("id = ?", id).Updates(&node)
+		db.Client.Model(&db.Node{}).Where("id = ?", id).Updates(&node).Association("Tags").Replace(node.Tags)
 		c.Header("X-Message", "Node updated")
 		c.JSON(200, node)
 	})
