@@ -16,7 +16,6 @@ func NewServer() *Server {
 func (s *Server) Start() {
 	s.RegisterNodesRoutes()
 	s.RegisterTailscaleRoutes()
-	s.RegisterOAuthRoutes()
 
 	s.router.Run()
 }

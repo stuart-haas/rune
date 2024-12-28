@@ -21,11 +21,3 @@ type NodeTag struct {
 	Name string
 }
 
-type OAuthClient struct {
-	gorm.Model
-	Name          string
-	Description   string
-	IsConnected   bool
-	ClientID      string
-	ClientSecret  string
-}
