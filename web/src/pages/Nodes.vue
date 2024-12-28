@@ -257,26 +257,7 @@ import { Input } from '@/components/ui/input'
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
 import { useForm } from 'vee-validate'
 import { array, object, string } from 'yup'
-
-const formatDate = (dateString) => {
-  try {
-    const date = new Date(dateString)
-    if (isNaN(date)) return 'Invalid Date'
-    
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    }).format(date)
-  } catch (error) {
-    console.error('Error formatting date:', error)
-    return 'Invalid Date'
-  }
-}
+import { formatDate } from '@/lib/utils'
 
 const formSchema = object({
   Hostname: string().required('Hostname is required'),
