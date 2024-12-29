@@ -100,7 +100,7 @@ func (s *TailscaleClient) CheckDevices() ([]TailscaleDevice, error) {
 	// Create map of DB devices for easy lookup
 	dbDevices := make(map[string]bool)
 	for _, node := range nodes {
-		dbDevices[node.ExternalID] = true
+		dbDevices[*node.ExternalID] = true
 	}
 
 	// Find Tailscale devices that don't exist in DB
@@ -124,16 +124,18 @@ func (s *TailscaleClient) SyncDevices() error {
 		var node db.Node
 		result := db.Client.Where("external_id = ? AND external_provider = ?", device.ID, "tailscale").First(&node)
 		
+		now := time.Now()
+		externalProvider := "tailscale"
 		if result.Error == nil {
 			node.Hostname = device.Hostname
-			node.SyncedAt = time.Now()
+			node.SyncedAt = &now
 			db.Client.Save(&node)
 		} else {
 			db.Client.Create(&db.Node{
 				Hostname:         device.Hostname,
-				ExternalID:       device.ID,
-				ExternalProvider: "tailscale",
-				SyncedAt:         time.Now(),
+				ExternalID:       &device.ID,
+				ExternalProvider: &externalProvider,
+				SyncedAt:         &now,
 			})
 		}
 	}
@@ -150,16 +152,18 @@ func (s *TailscaleClient) SyncDevice(id string) error {
 	var node db.Node
 	result := db.Client.Where("external_id = ? AND external_provider = ?", device.ID, "tailscale").First(&node)
 
+	now := time.Now()
+	externalProvider := "tailscale"
 	if result.Error == nil {
 		node.Hostname = device.Hostname
-		node.SyncedAt = time.Now()
+		node.SyncedAt = &now
 		db.Client.Save(&node)
 	} else {
 		db.Client.Create(&db.Node{
 			Hostname:         device.Hostname,
-			ExternalID:       device.ID,
-			ExternalProvider: "tailscale",
-			SyncedAt:         time.Now(),
+			ExternalID:       &device.ID,
+			ExternalProvider: &externalProvider,
+			SyncedAt:         &now,
 		})
 	}
 

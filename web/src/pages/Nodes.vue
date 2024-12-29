@@ -14,9 +14,9 @@
     <Card v-for="node in nodes" :key="node.id" class="w-full">
       <CardHeader>
         <CardTitle>{{ node.Hostname }}</CardTitle>
-        <CardDescription>User: {{ node.User }}</CardDescription>
+        <CardDescription>User: {{ node.User || 'Not specified' }}</CardDescription>
         <CardDescription v-if="node.ExternalID">External Provider: {{ node.ExternalProvider }}</CardDescription>
-        <CardDescription>Synced At: {{ node.SyncedAt ? formatDate(node.SyncedAt) : 'Never' }}</CardDescription>
+        <CardDescription v-if="node.SyncedAt">Synced At: {{ formatDate(node.SyncedAt) }}</CardDescription>
         <div class="flex flex-wrap gap-2 mt-2">
           <span 
             v-for="tag in node.Tags" 
@@ -28,25 +28,30 @@
         </div>
       </CardHeader>
       <CardFooter class="flex justify-end space-x-2">
-        <Button variant="outline" @click="handleEdit(node)">
-          <FontAwesomeIcon icon="pen-to-square" />
-          Edit
-        </Button>
-        <Button 
-          v-if="node.ExternalID"
-          variant="outline" 
-          @click="handleSync(node.ExternalID)"
-        >
-          <FontAwesomeIcon icon="sync" class="mr-2" />
-          Sync
-        </Button>
         <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive" size="sm">
-              <FontAwesomeIcon icon="trash" />
-              Delete
-            </Button>
-          </AlertDialogTrigger>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <FontAwesomeIcon icon="ellipsis-vertical" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem @click="handleEdit(node)">
+                <FontAwesomeIcon icon="pen-to-square" class="mr-2" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem v-if="node.ExternalID" @click="handleSync(node.ExternalID)">
+                <FontAwesomeIcon icon="sync" class="mr-2" />
+                Sync
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <AlertDialogTrigger>
+                  <FontAwesomeIcon icon="trash" class="mr-2" />
+                  <span class="text-red-600">Delete</span>
+                </AlertDialogTrigger>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
@@ -96,27 +101,31 @@
               </span>
             </div>
           </TableCell>
-          <TableCell class="text-right space-x-2">
-            <Button variant="outline" size="sm" @click="handleEdit(node)">
-              <FontAwesomeIcon icon="pen-to-square" />
-              Edit
-            </Button>
-            <Button 
-              v-if="node.ExternalID"
-              variant="outline"
-              size="sm" 
-              @click="handleSync(node.ExternalID)"
-            >
-              <FontAwesomeIcon icon="sync" />
-              Sync
-            </Button>
+          <TableCell class="text-right">
             <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="sm">
-                  <FontAwesomeIcon icon="trash" />
-                  Delete
-                </Button>
-              </AlertDialogTrigger>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <FontAwesomeIcon icon="ellipsis-vertical" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem @click="handleEdit(node)">
+                    <FontAwesomeIcon icon="pen-to-square" class="mr-2" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem v-if="node.ExternalID" @click="handleSync(node.ExternalID)">
+                    <FontAwesomeIcon icon="sync" class="mr-2" />
+                    Sync
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <AlertDialogTrigger>
+                      <FontAwesomeIcon icon="trash" class="mr-2" />
+                      <span class="text-red-600">Delete</span>
+                    </AlertDialogTrigger>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you sure?</AlertDialogTitle>
@@ -137,6 +146,7 @@
         </TableRow>
       </TableBody>
     </Table>
+
   </div>
 
   <Dialog :open="!!editingNode" @update:open="editingNode = null">
@@ -279,6 +289,12 @@ import { useForm } from 'vee-validate'
 import { array, object, string } from 'yup'
 import { formatDate } from '@/lib/utils'
 import { useTailscaleAPI } from '@/api/tailscale'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 const formSchema = object({
   Hostname: string().required('Hostname is required'),

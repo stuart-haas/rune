@@ -25,7 +25,7 @@ var createNodeCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		db.Client.Create(&db.Node{Hostname: hostname, User: user})
+		db.Client.Create(&db.Node{Hostname: hostname, User: &user})
 		log.Println("Node created")
 	},
 }

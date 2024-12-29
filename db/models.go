@@ -9,10 +9,10 @@ import (
 type Node struct {
 	gorm.Model
 	Hostname          string `gorm:"unique"`
-	User              string
-	ExternalID        string
-	ExternalProvider  string
-	SyncedAt          time.Time
+	User              *string
+	ExternalID        *string
+	ExternalProvider  *string
+	SyncedAt          *time.Time
 	Tags             []NodeTag  `gorm:"many2many:nodes_tags"`
 }
 
