@@ -15,7 +15,7 @@
       <CardHeader>
         <CardTitle>{{ node.Hostname }}</CardTitle>
         <CardDescription>User: {{ node.User }}</CardDescription>
-        <CardDescription>Last Sync: {{ node.LastSync ? formatDate(node.LastSync) : 'Never' }}</CardDescription>
+        <CardDescription>Synced At: {{ node.SyncedAt ? formatDate(node.SyncedAt) : 'Never' }}</CardDescription>
         <div class="flex flex-wrap gap-2 mt-2">
           <span 
             v-for="tag in node.Tags" 
@@ -64,7 +64,7 @@
         <TableRow>
           <TableHead>Hostname</TableHead>
           <TableHead>User</TableHead>
-          <TableHead>Last Sync</TableHead>
+          <TableHead>Synced At</TableHead>
           <TableHead>Tags</TableHead>
           <TableHead class="text-right">Actions</TableHead>
         </TableRow>
@@ -73,7 +73,7 @@
         <TableRow v-for="node in nodes" :key="node.id">
           <TableCell>{{ node.Hostname }}</TableCell>
           <TableCell>{{ node.User }}</TableCell>
-          <TableCell>{{ node.LastSync ? formatDate(node.LastSync) : 'Never' }}</TableCell>
+          <TableCell>{{ node.SyncedAt ? formatDate(node.SyncedAt) : 'Never' }}</TableCell>
           <TableCell>
             <div class="flex flex-wrap gap-2">
               <span 

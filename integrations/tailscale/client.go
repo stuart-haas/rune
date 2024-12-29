@@ -13,6 +13,8 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
+var baseUrl = "https://api.tailscale.com/api/v2"
+
 type TailscaleDeviceResponse struct {
 	Devices []TailscaleDevice `json:"devices"`
 }
@@ -20,30 +22,31 @@ type TailscaleDeviceResponse struct {
 type TailscaleDevice struct {
 	ID string `json:"id"`
 	Hostname string `json:"hostname"`
-	Tags []string `json:"tags"`
+	Addresses []string `json:"addresses"`
+	Permalink string `json:"permalink"`
 }
 
-type TailscaleOAuthClient struct {
+type TailscaleClient struct {
 	client *http.Client
 	tailnet string
 }
 
-func NewTailscaleClient() *TailscaleOAuthClient {
+func NewTailscaleClient() *TailscaleClient {
 	var oauthConfig = &clientcredentials.Config{
 		ClientID:     os.Getenv("TAILSCALE_OAUTH_CLIENT_ID"),
 		ClientSecret: os.Getenv("TAILSCALE_OAUTH_CLIENT_SECRET"),
-		TokenURL:     "https://api.tailscale.com/api/v2/oauth/token",
+		TokenURL:     fmt.Sprintf("%s/oauth/token", baseUrl),
 	}
 	client := oauthConfig.Client(context.Background())
 
-	return &TailscaleOAuthClient{
+	return &TailscaleClient{
 		client: client,
 		tailnet: os.Getenv("TAILSCALE_TAILNET"),
 	}
 }
 
-func (s *TailscaleOAuthClient) FetchDevices() ([]TailscaleDevice, error) {
-	res, err := s.client.Get(fmt.Sprintf("https://api.tailscale.com/api/v2/tailnet/%s/devices", s.tailnet))
+func (s *TailscaleClient) FetchDevices() ([]TailscaleDevice, error) {
+	res, err := s.client.Get(fmt.Sprintf("%s/tailnet/%s/devices", baseUrl, s.tailnet))
 	if err != nil {
 		return nil, err
 	}
@@ -61,8 +64,8 @@ func (s *TailscaleOAuthClient) FetchDevices() ([]TailscaleDevice, error) {
 	return wrapper.Devices, nil
 }
 
-func (s *TailscaleOAuthClient) FetchDevice(id string) (TailscaleDevice, error) {
-	res, err := s.client.Get(fmt.Sprintf("https://api.tailscale.com/api/v2/device/%s", id))
+func (s *TailscaleClient) FetchDevice(id string) (TailscaleDevice, error) {
+	res, err := s.client.Get(fmt.Sprintf("%s/device/%s", baseUrl, id))
 	if err != nil {
 		return TailscaleDevice{}, err
 	}
@@ -80,7 +83,7 @@ func (s *TailscaleOAuthClient) FetchDevice(id string) (TailscaleDevice, error) {
 	return device, nil
 }
 
-func (s *TailscaleOAuthClient) CheckDevices() ([]TailscaleDevice, error) {
+func (s *TailscaleClient) CheckDevices() ([]TailscaleDevice, error) {
 	// Fetch devices from Tailscale
 	devices, err := s.FetchDevices()
 	if err != nil {
@@ -111,7 +114,7 @@ func (s *TailscaleOAuthClient) CheckDevices() ([]TailscaleDevice, error) {
 	return missingDevices, nil
 }
 
-func (s *TailscaleOAuthClient) SyncDevices() error {
+func (s *TailscaleClient) SyncDevices() error {
 	devices, err := s.FetchDevices()
 	if err != nil {
 		return err
@@ -123,14 +126,14 @@ func (s *TailscaleOAuthClient) SyncDevices() error {
 		
 		if result.Error == nil {
 			node.Hostname = device.Hostname
-			node.LastSync = time.Now()
+			node.SyncedAt = time.Now()
 			db.Client.Save(&node)
 		} else {
 			db.Client.Create(&db.Node{
 				Hostname:         device.Hostname,
 				ExternalID:       device.ID,
 				ExternalProvider: "tailscale",
-				LastSync:         time.Now(),
+				SyncedAt:         time.Now(),
 			})
 		}
 	}
@@ -138,7 +141,7 @@ func (s *TailscaleOAuthClient) SyncDevices() error {
 	return nil
 }
 
-func (s *TailscaleOAuthClient) SyncDevice(id string) error {
+func (s *TailscaleClient) SyncDevice(id string) error {
 	device, err := s.FetchDevice(id)
 	if err != nil {
 		return err
@@ -149,14 +152,14 @@ func (s *TailscaleOAuthClient) SyncDevice(id string) error {
 
 	if result.Error == nil {
 		node.Hostname = device.Hostname
-		node.LastSync = time.Now()
+		node.SyncedAt = time.Now()
 		db.Client.Save(&node)
 	} else {
 		db.Client.Create(&db.Node{
 			Hostname:         device.Hostname,
 			ExternalID:       device.ID,
 			ExternalProvider: "tailscale",
-			LastSync:         time.Now(),
+			SyncedAt:         time.Now(),
 		})
 	}
 

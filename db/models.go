@@ -12,7 +12,7 @@ type Node struct {
 	User              string
 	ExternalID        string
 	ExternalProvider  string
-	LastSync          time.Time
+	SyncedAt          time.Time
 	Tags             []NodeTag  `gorm:"many2many:nodes_tags"`
 }
 
