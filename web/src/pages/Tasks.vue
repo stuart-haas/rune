@@ -100,21 +100,22 @@
             <FormMessage />
           </FormItem>
         </FormField>
-        <FormField v-slot="{ componentField }" name="Nodes">
+        <FormField v-slot="{ field }" name="Nodes">
           <FormItem>
             <FormLabel>Nodes</FormLabel>
+            {{ field.value }}
             <FormControl>
-              <ComboboxRoot>
+              <ComboboxRoot v-model="field.value" multiple>
                 <ComboboxAnchor>
                   <ComboboxInput />
                   <ComboboxTrigger />
                   <ComboboxCancel />
                 </ComboboxAnchor>
-                <ComboboxPortal>
-                  <ComboboxContent>
-                    <ComboboxItem v-for="node in nodes" :key="node.ID" :value="node.ID">{{ node.Hostname }}</ComboboxItem>
-                  </ComboboxContent>
-                </ComboboxPortal>
+                <ComboboxContent>
+                  <ComboboxItem v-for="(node, index) in nodes" :key="index" :value="node" class="rounded-md p-2 cursor-pointer">
+                    <span class="bg-gray-200 rounded-md p-1">{{ node.Hostname }}</span>
+                  </ComboboxItem>
+                </ComboboxContent>
               </ComboboxRoot>
             </FormControl>
           </FormItem>
@@ -161,7 +162,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
 import { useForm } from 'vee-validate'
-import { object, string } from 'yup'
+import { object, string, array } from 'yup'
 import { formatDate } from '@/lib/utils'
 import {
   DropdownMenu,
@@ -170,16 +171,20 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useTasksAPI } from '@/api/tasks'
-import { ComboboxAnchor, ComboboxContent, ComboboxInput, ComboboxPortal, ComboboxRoot, ComboboxItem, ComboboxTrigger, ComboboxCancel } from 'radix-vue'
+import { ComboboxAnchor, ComboboxContent, ComboboxInput, ComboboxPortal, ComboboxRoot, ComboboxItem, ComboboxTrigger, ComboboxCancel, ComboboxViewport } from 'radix-vue'
 import { CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
 import { useNodesAPI } from '@/api/nodes'
 
 const formSchema = object({
   Command: string().required('Command is required'),
+  Nodes: array().required('Nodes are required'),
 })
 
 const form = useForm({
   validationSchema: formSchema,
+  initialValues: {
+    Nodes: [],
+  },
 })
 
 const tasksApi = useTasksAPI()
@@ -193,9 +198,9 @@ const { data: nodes } = nodesApi.fetch()
 
 const addingTask = ref(false)
 const editingTask = ref(null)
+const selectedNodes = ref([])
 
 const handleAdd = () => {
-
   addingTask.value = true
 }
 
