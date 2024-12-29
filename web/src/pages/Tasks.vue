@@ -10,14 +10,14 @@
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Command</TableHead>
+          <TableHead>Name</TableHead>
           <TableHead>Created At</TableHead>
           <TableHead class="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         <TableRow v-for="task in tasks" :key="task.id">
-          <TableCell>{{ task.Command }}</TableCell>
+          <TableCell>{{ task.Name }}</TableCell>
           <TableCell>{{ task.CreatedAt ? formatDate(task.CreatedAt) : 'Never' }}</TableCell>
           <TableCell class="text-right">
             <AlertDialog>
@@ -68,11 +68,11 @@
         <DialogTitle>Edit Task</DialogTitle>
       </DialogHeader>
       <form>
-        <FormField v-slot="{ componentField }" name="Command">
+        <FormField v-slot="{ componentField }" name="Name">
           <FormItem>
-            <FormLabel>Command</FormLabel>
+            <FormLabel>Name</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="ls -l" v-bind="componentField" />
+              <Input type="text" placeholder="name" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -91,33 +91,13 @@
         <DialogTitle>Add Task</DialogTitle>
       </DialogHeader>
       <form>
-        <FormField v-slot="{ componentField }" name="Command">
+        <FormField v-slot="{ componentField }" name="Name">
           <FormItem>
-            <FormLabel>Command</FormLabel>
+            <FormLabel>Name</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="ls -l" v-bind="componentField" />
+              <Input type="text" placeholder="name" v-bind="componentField" />
             </FormControl>
             <FormMessage />
-          </FormItem>
-        </FormField>
-        <FormField v-slot="{ field }" name="Nodes">
-          <FormItem>
-            <FormLabel>Nodes</FormLabel>
-            {{ field.value }}
-            <FormControl>
-              <ComboboxRoot v-model="field.value" multiple>
-                <ComboboxAnchor>
-                  <ComboboxInput />
-                  <ComboboxTrigger />
-                  <ComboboxCancel />
-                </ComboboxAnchor>
-                <ComboboxContent>
-                  <ComboboxItem v-for="(node, index) in nodes" :key="index" :value="node" class="rounded-md p-2 cursor-pointer">
-                    <span class="bg-gray-200 rounded-md p-1">{{ node.Hostname }}</span>
-                  </ComboboxItem>
-                </ComboboxContent>
-              </ComboboxRoot>
-            </FormControl>
           </FormItem>
         </FormField>
       </form>
@@ -171,13 +151,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useTasksAPI } from '@/api/tasks'
-import { ComboboxAnchor, ComboboxContent, ComboboxInput, ComboboxPortal, ComboboxRoot, ComboboxItem, ComboboxTrigger, ComboboxCancel, ComboboxViewport } from 'radix-vue'
-import { CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
-import { useNodesAPI } from '@/api/nodes'
 
 const formSchema = object({
-  Command: string().required('Command is required'),
-  Nodes: array().required('Nodes are required'),
+  Name: string().required('Name is required'),
 })
 
 const form = useForm({
@@ -193,12 +169,8 @@ const { mutateAsync: createTask } = tasksApi.create()
 const { mutateAsync: updateTask } = tasksApi.update()
 const { mutateAsync: deleteTask } = tasksApi.delete()
 
-const nodesApi = useNodesAPI()
-const { data: nodes } = nodesApi.fetch()
-
 const addingTask = ref(false)
 const editingTask = ref(null)
-const selectedNodes = ref([])
 
 const handleAdd = () => {
   addingTask.value = true

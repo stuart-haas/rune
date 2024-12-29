@@ -24,6 +24,6 @@ type NodeTag struct {
 
 type Task struct {
 	gorm.Model
-	Command *string
+	Name string
 	Nodes   []Node `gorm:"many2many:tasks_nodes"`
 }
