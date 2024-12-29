@@ -121,22 +121,8 @@ func (s *TailscaleClient) SyncDevices() error {
 	}
 
 	for _, device := range devices {
-		var node db.Node
-		result := db.Client.Where("external_id = ? AND external_provider = ?", device.ID, "tailscale").First(&node)
-		
-		now := time.Now()
-		externalProvider := "tailscale"
-		if result.Error == nil {
-			node.Hostname = device.Hostname
-			node.SyncedAt = &now
-			db.Client.Save(&node)
-		} else {
-			db.Client.Create(&db.Node{
-				Hostname:         device.Hostname,
-				ExternalID:       &device.ID,
-				ExternalProvider: &externalProvider,
-				SyncedAt:         &now,
-			})
+		if err := s.syncDevice(device); err != nil {
+			return err
 		}
 	}
 
@@ -149,6 +135,14 @@ func (s *TailscaleClient) SyncDevice(id string) error {
 		return err
 	}
 
+	if err := s.syncDevice(device); err != nil {
+		return err
+	}
+
+	return nil;
+}
+
+func (s *TailscaleClient) syncDevice(device TailscaleDevice) error {
 	var node db.Node
 	result := db.Client.Where("external_id = ? AND external_provider = ?", device.ID, "tailscale").First(&node)
 
