@@ -5,6 +5,8 @@ import Tasks from '@/pages/Tasks.vue'
 import Settings from '@/pages/Settings.vue'
 import Schedules from '@/pages/Schedules.vue'
 import NodeDetail from '@/pages/NodeDetail.vue'
+import Dashboard from '@/pages/Dashboard.vue'
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -12,6 +14,14 @@ const router = createRouter({
       path: '/',
       component: DefaultLayout,
       children: [
+        {
+          path: '',
+          name: 'Dashboard',
+          component: Dashboard,
+          meta: {
+            title: 'Dashboard'
+          }
+        },
         {
           path: 'nodes',
           name: 'Nodes',
