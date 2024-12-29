@@ -12,6 +12,11 @@ const fetchNodeTags = async () => {
   return data
 }
 
+const fetchNode = async (id) => {
+  const { data } = await client.get(`/nodes/${id}`)
+  return data
+}
+
 const createNode = async (node) => {
   const { data } = await client.post('/nodes', node)
   return data
@@ -39,6 +44,12 @@ export const useNodesAPI = () => {
     fetchTags: () => useQuery({
       queryKey: ['node-tags'],
       queryFn: fetchNodeTags,
+    }),
+
+    fetchNode: (id) => useQuery({
+      enabled: !!id,
+      queryKey: ['node', id.value],
+      queryFn: () => fetchNode(id.value),
     }),
 
     create: () => useMutation({

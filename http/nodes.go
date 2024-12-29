@@ -27,6 +27,17 @@ func (s *Server) RegisterNodesRoutes() {
 		c.JSON(200, nodeTags)
 	})
 
+	s.router.GET("/nodes/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		var node db.Node
+		result := db.Client.Preload("Tags").First(&node, id)
+		if result.Error != nil {
+			c.JSON(500, gin.H{"error": result.Error.Error()})
+			return
+		}
+		c.JSON(200, node)
+	})
+
 	s.router.POST("/nodes", func(c *gin.Context) {
 		var node db.Node
 		if err := c.ShouldBindJSON(&node); err != nil {

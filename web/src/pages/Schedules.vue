@@ -1,3 +1,3 @@
 <template>
-  <h1>Schedules</h1>
+  <h1 class="text-2xl font-bold mb-6">Schedules</h1>
 </template>

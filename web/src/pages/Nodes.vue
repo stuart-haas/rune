@@ -1,4 +1,6 @@
 <template>
+  <h1 class="text-2xl font-bold mb-6">Nodes</h1>
+
   <div class="mb-4 flex justify-between">
     <Button variant="default" @click="handleAdd">
       <FontAwesomeIcon icon="plus" class="mr-2" />
@@ -13,7 +15,11 @@
   <div v-if="isGridView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     <Card v-for="node in nodes" :key="node.id" class="w-full">
       <CardHeader>
-        <CardTitle>{{ node.Hostname }}</CardTitle>
+        <CardTitle class="text-lg">
+          <RouterLink :to="{ name: 'NodeDetail', params: { id: node.ID } }" class="text-blue-500 hover:underline">
+            {{ node.Hostname }}
+          </RouterLink>
+        </CardTitle>
         <CardDescription>User: {{ node.User || 'Not specified' }}</CardDescription>
         <CardDescription v-if="node.ExternalID">External Provider: {{ node.ExternalProvider }}</CardDescription>
         <CardDescription v-if="node.SyncedAt">Synced At: {{ formatDate(node.SyncedAt) }}</CardDescription>
@@ -86,7 +92,11 @@
       </TableHeader>
       <TableBody>
         <TableRow v-for="node in nodes" :key="node.id">
-          <TableCell>{{ node.Hostname }}</TableCell>
+          <TableCell>
+            <RouterLink :to="{ name: 'NodeDetail', params: { id: node.ID } }" class="text-blue-500 hover:underline">
+              {{ node.Hostname }}
+            </RouterLink>
+          </TableCell>
           <TableCell>{{ node.User }}</TableCell>
           <TableCell>{{ node.ExternalID ? node.ExternalProvider : '-' }}</TableCell>
           <TableCell>{{ node.SyncedAt ? formatDate(node.SyncedAt) : 'Never' }}</TableCell>
