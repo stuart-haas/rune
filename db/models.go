@@ -14,6 +14,7 @@ type Node struct {
 	ExternalProvider  *string
 	SyncedAt          *time.Time
 	Tags             []NodeTag  `gorm:"many2many:nodes_tags"`
+	Tasks            []Task     `gorm:"many2many:tasks_nodes"`
 }
 
 type NodeTag struct {
@@ -23,5 +24,6 @@ type NodeTag struct {
 
 type Task struct {
 	gorm.Model
-	Command string
+	Command *string
+	Nodes   []Node `gorm:"many2many:tasks_nodes"`
 }

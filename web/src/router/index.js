@@ -3,6 +3,7 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import Nodes from '@/pages/Nodes.vue'
 import Tasks from '@/pages/Tasks.vue'
 import Settings from '@/pages/Settings.vue'
+import Schedules from '@/pages/Schedules.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -25,6 +26,14 @@ const router = createRouter({
           component: Tasks,
           meta: {
             title: 'Tasks'
+          }
+        },
+        {
+          path: 'schedules',
+          name: 'Schedules',
+          component: Schedules,
+          meta: {
+            title: 'Schedules'
           }
         },
         {

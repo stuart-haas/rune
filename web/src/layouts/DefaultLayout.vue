@@ -10,6 +10,7 @@
               <li><router-link to="/" class="text-gray-300 hover:text-white">Dashboard</router-link></li>
               <li><router-link to="/nodes" class="text-gray-300 hover:text-white">Nodes</router-link></li>
               <li><router-link to="/tasks" class="text-gray-300 hover:text-white">Tasks</router-link></li>
+              <li><router-link to="/schedules" class="text-gray-300 hover:text-white">Schedules</router-link></li>
               <li><router-link to="/settings" class="text-gray-300 hover:text-white">Settings</router-link></li>
             </ul>
           </nav>

@@ -100,6 +100,25 @@
             <FormMessage />
           </FormItem>
         </FormField>
+        <FormField v-slot="{ componentField }" name="Nodes">
+          <FormItem>
+            <FormLabel>Nodes</FormLabel>
+            <FormControl>
+              <ComboboxRoot>
+                <ComboboxAnchor>
+                  <ComboboxInput />
+                  <ComboboxTrigger />
+                  <ComboboxCancel />
+                </ComboboxAnchor>
+                <ComboboxPortal>
+                  <ComboboxContent>
+                    <ComboboxItem v-for="node in nodes" :key="node.ID" :value="node.ID">{{ node.Hostname }}</ComboboxItem>
+                  </ComboboxContent>
+                </ComboboxPortal>
+              </ComboboxRoot>
+            </FormControl>
+          </FormItem>
+        </FormField>
       </form>
       <DialogFooter>
         <Button variant="outline" @click="addingTask = false">Cancel</Button>
@@ -151,6 +170,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useTasksAPI } from '@/api/tasks'
+import { ComboboxAnchor, ComboboxContent, ComboboxInput, ComboboxPortal, ComboboxRoot, ComboboxItem, ComboboxTrigger, ComboboxCancel } from 'radix-vue'
+import { CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
+import { useNodesAPI } from '@/api/nodes'
 
 const formSchema = object({
   Command: string().required('Command is required'),
@@ -165,6 +187,9 @@ const { data: tasks } = tasksApi.fetch()
 const { mutateAsync: createTask } = tasksApi.create()
 const { mutateAsync: updateTask } = tasksApi.update()
 const { mutateAsync: deleteTask } = tasksApi.delete()
+
+const nodesApi = useNodesAPI()
+const { data: nodes } = nodesApi.fetch()
 
 const addingTask = ref(false)
 const editingTask = ref(null)
