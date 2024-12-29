@@ -1,6 +1,6 @@
 <template>
   <div class="mb-4 flex justify-between">
-    <Button variant="default" @click="addingNode = true">
+    <Button variant="default" @click="handleAdd">
       <FontAwesomeIcon icon="plus" class="mr-2" />
       New Node
     </Button>
@@ -321,6 +321,11 @@ const { mutateAsync: syncDevice } = tailscaleApi.syncDevice()
 const isGridView = ref(true)
 const addingNode = ref(false)
 const editingNode = ref(null)
+
+const handleAdd = () => {
+  form.setValues({ Tags: [] })
+  addingNode.value = true
+}
 
 const handleEdit = (node) => {
   editingNode.value = node

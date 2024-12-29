@@ -20,11 +20,10 @@ axiosClient.interceptors.response.use(
   },
   (error) => {
     const { toast } = useToast()
-    const message = error.response?.headers?.['x-message']
-    if (message) {
+    if (error.response.data.error) {
       toast({
         title: 'Error',
-        description: message,
+        description: error.response.data.error,
         variant: 'destructive'
       })
     }
