@@ -1,7 +1,7 @@
 package http
 
 import (
-	"rune/tailscale"
+	"rune/integrations/tailscale"
 
 	"github.com/gin-gonic/gin"
 )

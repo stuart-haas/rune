@@ -300,8 +300,8 @@ const handleCreate = form.handleSubmit(async (payload) => {
 const handleUpdate = form.handleSubmit(async (payload) => {
   const formattedPayload = {
     ...payload,
+    ID: editingNode.value.ID,
     Tags: payload.Tags ? payload.Tags.map(tag => ({ Name: tag })) : [],
-    ID: editingNode.value.ID
   }
   await updateNode(formattedPayload)
   editingNode.value = null
