@@ -15,6 +15,7 @@
       <CardHeader>
         <CardTitle>{{ node.Hostname }}</CardTitle>
         <CardDescription>User: {{ node.User }}</CardDescription>
+        <CardDescription v-if="node.ExternalID">External Provider: {{ node.ExternalProvider }}</CardDescription>
         <CardDescription>Synced At: {{ node.SyncedAt ? formatDate(node.SyncedAt) : 'Never' }}</CardDescription>
         <div class="flex flex-wrap gap-2 mt-2">
           <span 
@@ -30,6 +31,14 @@
         <Button variant="outline" @click="handleEdit(node)">
           <FontAwesomeIcon icon="pen-to-square" />
           Edit
+        </Button>
+        <Button 
+          v-if="node.ExternalID"
+          variant="outline" 
+          @click="handleSync(node.ExternalID)"
+        >
+          <FontAwesomeIcon icon="sync" class="mr-2" />
+          Sync
         </Button>
         <AlertDialog>
           <AlertDialogTrigger asChild>
@@ -64,6 +73,7 @@
         <TableRow>
           <TableHead>Hostname</TableHead>
           <TableHead>User</TableHead>
+          <TableHead>External Provider</TableHead>
           <TableHead>Synced At</TableHead>
           <TableHead>Tags</TableHead>
           <TableHead class="text-right">Actions</TableHead>
@@ -73,6 +83,7 @@
         <TableRow v-for="node in nodes" :key="node.id">
           <TableCell>{{ node.Hostname }}</TableCell>
           <TableCell>{{ node.User }}</TableCell>
+          <TableCell>{{ node.ExternalID ? node.ExternalProvider : '-' }}</TableCell>
           <TableCell>{{ node.SyncedAt ? formatDate(node.SyncedAt) : 'Never' }}</TableCell>
           <TableCell>
             <div class="flex flex-wrap gap-2">
@@ -89,6 +100,15 @@
             <Button variant="outline" size="sm" @click="handleEdit(node)">
               <FontAwesomeIcon icon="pen-to-square" />
               Edit
+            </Button>
+            <Button 
+              v-if="node.ExternalID"
+              variant="outline"
+              size="sm" 
+              @click="handleSync(node.ExternalID)"
+            >
+              <FontAwesomeIcon icon="sync" />
+              Sync
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -258,6 +278,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/comp
 import { useForm } from 'vee-validate'
 import { array, object, string } from 'yup'
 import { formatDate } from '@/lib/utils'
+import { useTailscaleAPI } from '@/api/tailscale'
 
 const formSchema = object({
   Hostname: string().required('Hostname is required'),
@@ -277,6 +298,9 @@ const { data: nodes } = nodesApi.fetch()
 const { mutateAsync: createNode } = nodesApi.create()
 const { mutateAsync: updateNode } = nodesApi.update()
 const { mutateAsync: deleteNode } = nodesApi.delete()
+
+const tailscaleApi = useTailscaleAPI()
+const { mutateAsync: syncDevice } = tailscaleApi.syncDevice()
 
 const isGridView = ref(true)
 const addingNode = ref(false)
@@ -309,5 +333,9 @@ const handleUpdate = form.handleSubmit(async (payload) => {
 
 const handleDelete = async (id) => {
   await deleteNode(id)
+}
+
+const handleSync = async (externalId) => {
+  await syncDevice(externalId)
 }
 </script>

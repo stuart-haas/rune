@@ -38,14 +38,14 @@ export const useTailscaleAPI = () => {
     syncDevices: () => useMutation({
       mutationFn: syncDevices,
       onSuccess: () => {
-        queryClient.invalidateQueries(['tailscale-devices-check'])
+        queryClient.invalidateQueries(['tailscale-devices', 'tailscale-devices-check'])
       }
     }),
 
     syncDevice: () => useMutation({
       mutationFn: syncDevice,
       onSuccess: () => {
-        queryClient.invalidateQueries(['tailscale-devices-check'])
+        queryClient.invalidateQueries(['tailscale-devices', 'tailscale-devices-check'])
       }
     })
   }
