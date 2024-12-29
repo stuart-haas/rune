@@ -146,7 +146,6 @@
         </TableRow>
       </TableBody>
     </Table>
-
   </div>
 
   <Dialog :open="!!editingNode" @update:open="editingNode = null">

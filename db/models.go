@@ -21,3 +21,7 @@ type NodeTag struct {
 	Name string
 }
 
+type Task struct {
+	gorm.Model
+	Command string
+}

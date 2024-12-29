@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import Nodes from '@/pages/Nodes.vue'
+import Tasks from '@/pages/Tasks.vue'
 import Settings from '@/pages/Settings.vue'
 
 const router = createRouter({
@@ -21,7 +22,7 @@ const router = createRouter({
         {
           path: 'tasks',
           name: 'Tasks',
-          component: Nodes,
+          component: Tasks,
           meta: {
             title: 'Tasks'
           }
